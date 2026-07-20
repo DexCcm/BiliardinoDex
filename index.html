@@ -41,13 +41,16 @@ body{
   color:var(--ink2);
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
+  touch-action:manipulation;        /* niente double-tap-zoom (scroll e pinch restano) */
+  -webkit-tap-highlight-color:transparent;
 }
 a{color:var(--blue);text-decoration:none}
 a:hover{color:#2c568f}
 ::-webkit-scrollbar{height:10px;width:10px}
 ::-webkit-scrollbar-thumb{background:#d8d2c4;border-radius:6px}
 ::-webkit-scrollbar-track{background:transparent}
-button{font-family:var(--font);cursor:pointer}
+button{font-family:var(--font);cursor:pointer;touch-action:manipulation}
+button,input,a,.chip,.rank-row,.pair-row,.mall,.prow{touch-action:manipulation}
 h1,h2,h3{font-family:var(--display)}
 
 /* ---------- keyframes ---------- */
@@ -81,6 +84,8 @@ h1,h2,h3{font-family:var(--display)}
 @keyframes modalIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 @keyframes flashRow{0%{background:#fff7d6}100%{}}
+/* leggero brillìo che attraversa il badge ruolo (badge stabile, non pulsa) */
+@keyframes roleShine{0%{left:-45%}18%{left:115%}100%{left:115%}}
 
 @media (prefers-reduced-motion: reduce){
   *{animation-duration:.001s!important;animation-iteration-count:1!important}
@@ -243,6 +248,10 @@ section{animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
 .pair-row b{color:var(--ink2);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pair-row .wp{text-align:center;font-size:13px;font-weight:700;color:var(--muted)}
 .pair-row .pct{text-align:right;font-family:var(--display);font-weight:700;font-size:15px;color:var(--ink2)}
+.team-pager{width:100%;margin-top:10px;border:none;background:transparent;color:var(--muted);font-family:var(--font);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;border-radius:12px;transition:.15s}
+.team-pager:hover{background:#f3ede1;color:var(--ink2)}
+.team-pager .chev{font-size:14px;line-height:1}
+.team-pager .pg{font-size:11px;font-weight:700;color:var(--muted2);background:#efe8db;padding:2px 8px;border-radius:20px}
 .best .n .goat{font-size:24px}
 .best,.worst{border-radius:var(--radius);padding:26px 28px}
 .best{background:linear-gradient(150deg,#e6f6ea,#d6efdd);box-shadow:0 12px 34px rgba(60,110,70,.12)}
@@ -264,7 +273,9 @@ section{animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
 .pcard .badge{width:54px;height:54px;border-radius:18px;color:#fff;font-family:var(--display);font-weight:700;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(70,66,80,.2);flex-shrink:0}
 .pcard .nm{font-family:var(--display);font-weight:700;font-size:21px;color:var(--ink);line-height:1}
 .pcard .pl{font-size:13px;font-weight:700;color:var(--muted2);margin-top:3px}
-.role{font-weight:800;font-size:12px;padding:7px 12px;border-radius:30px;white-space:nowrap;align-self:flex-start}
+.role{font-weight:800;font-size:12px;padding:7px 12px;border-radius:30px;white-space:nowrap;align-self:flex-start;display:inline-flex;align-items:center;gap:4px;position:relative;overflow:hidden;box-shadow:0 0 9px color-mix(in srgb, currentColor 20%, transparent)}
+.role::before{content:"";position:absolute;top:0;bottom:0;left:-45%;width:38%;background:linear-gradient(115deg,transparent,rgba(255,255,255,.6),transparent);transform:skewX(-18deg);pointer-events:none;animation:roleShine 3.5s ease-in-out infinite}
+.role .role-ic{font-size:1.4em;line-height:1;position:relative}
 .pcard .stats{display:flex;gap:10px;margin:20px 0 16px;position:relative}
 .pcard .stat{flex:1;text-align:center;background:#f5eee2;border-radius:14px;padding:12px 6px}
 .pcard .stat .n{font-family:var(--display);font-weight:700;font-size:24px;line-height:1}
@@ -341,11 +352,15 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
 .stepper input{width:44px;text-align:center;border:none;background:transparent;font-family:var(--display);font-weight:700;font-size:24px;color:var(--ink);-moz-appearance:textfield}
 .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .pick{display:flex;flex-direction:column;gap:8px}
-.pick input{width:100%;border:1.5px solid transparent;background:#fff;border-radius:12px;padding:11px 14px;font-family:var(--font);font-weight:700;font-size:15px;color:var(--ink2);transition:.15s}
-.pick input:focus{outline:none;border-color:currentColor}
-.team-block.blue .pick input:focus{border-color:var(--blue-soft)}
-.team-block.red .pick input:focus{border-color:var(--red-soft)}
+.pick input,.pick select{width:100%;border:1.5px solid transparent;background:#fff;border-radius:12px;padding:11px 14px;font-family:var(--font);font-weight:700;font-size:15px;color:var(--ink2);transition:.15s}
+.pick input:focus,.pick select:focus{outline:none;border-color:currentColor}
+.team-block.blue .pick input:focus,.team-block.blue .pick select:focus{border-color:var(--blue-soft)}
+.team-block.red .pick input:focus,.team-block.red .pick select:focus{border-color:var(--red-soft)}
 .pick input::placeholder{color:#bdb8c4;font-weight:700}
+.pick select{appearance:none;-webkit-appearance:none;-moz-appearance:none;cursor:pointer;padding-right:36px;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='14'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%239a95a5'%20stroke-width='3'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M6%209l6%206%206-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;background-size:14px}
+.pick select:has(option[value='']:checked){color:#bdb8c4}
 .form-msg{min-height:20px;font-size:13px;font-weight:800;color:var(--red);margin:2px 0 12px;text-align:center}
 .form-msg.ok{color:var(--green)}
 .modal-actions{display:flex;gap:12px;margin-top:6px}
@@ -406,6 +421,8 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
   .rank-head .col-played,.rank-row .p{display:none}
   .mall{grid-template-columns:26px 1fr auto 1fr 22px;gap:8px}
   .brand .s{display:none}
+  /* iOS non zooma al focus se il testo del campo è >= 16px */
+  .pick input,.pick select,.addplayer input[type=text],#npName{font-size:16px}
 }
 @media (max-width:400px){
   .rank-head .col-win,.rank-row .w{display:none}
@@ -498,8 +515,8 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
         </div>
       </div>
       <div class="pick">
-        <input id="b1" list="players" placeholder="Giocatore 1" autocomplete="off">
-        <input id="b2" list="players" placeholder="Giocatore 2" autocomplete="off">
+        <select id="b1" class="psel"><option value="">Giocatore 1…</option></select>
+        <select id="b2" class="psel"><option value="">Giocatore 2…</option></select>
       </div>
     </div>
 
@@ -513,12 +530,10 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
         </div>
       </div>
       <div class="pick">
-        <input id="r1" list="players" placeholder="Giocatore 1" autocomplete="off">
-        <input id="r2" list="players" placeholder="Giocatore 2" autocomplete="off">
+        <select id="r1" class="psel"><option value="">Giocatore 1…</option></select>
+        <select id="r2" class="psel"><option value="">Giocatore 2…</option></select>
       </div>
     </div>
-
-    <datalist id="players"></datalist>
 
     <div class="form-msg" id="formMsg"></div>
 
@@ -669,7 +684,7 @@ function compute(objs){
 
   const pairsArr=Object.values(PR).filter(p=>p.played>=3).map(p=>({...p,winPct:pct(p.wins,p.played)}));
   const pairSorted=pairsArr.slice().sort((a,b)=>b.winPct-a.winPct||b.wins-a.wins);
-  const pairRank=pairSorted.slice(0,7).map((p,i)=>({...p,rank:i+1}));
+  const pairRank=pairSorted.map((p,i)=>({...p,rank:i+1}));
   const bestPair=pairSorted[0]||{names:"—",winPct:0,wins:0,played:0};
   const worstPair=pairSorted[pairSorted.length-1]||{names:"—",winPct:0,wins:0,played:0};
 
@@ -759,10 +774,42 @@ function rodsHtml(rods,pegSize){
 }
 
 /* ---- render dashboard ---- */
+let teamPage=0;   // pagina corrente della classifica team (toggle in basso)
+
+/* Costruisce righe + pager della classifica team per la pagina corrente.
+   pageSize = righe della classifica giocatori → stessa altezza dei due pannelli. */
+function buildTeamRanking(d){
+  const size=Math.max(1,d.playerRank.length);
+  const pages=Math.max(1,Math.ceil(d.pairRank.length/size));
+  if(teamPage>=pages)teamPage=0;
+  const slice=d.pairRank.slice(teamPage*size,teamPage*size+size);
+  const fill=Math.max(0,size-slice.length);
+  const rows = d.pairRank.length ? (
+    slice.map(c=>`
+    <div class="pair-row"><span class="pos">${c.rank}</span>
+    <span class="pteam"><b>${esc(c.names)}</b>${medalTag(c.rank)}</span>
+    <span class="wp">${c.wins}/${c.played}</span><span class="pct" style="color:${pctColor(c.winPct)}">${c.winPct}%</span></div>`).join("")
+    + Array.from({length:fill},()=>`<div class="pair-row" aria-hidden="true" style="visibility:hidden"><span class="pos">0</span><span class="pteam"><b>—</b></span><span class="wp">—</span><span class="pct">0%</span></div>`).join("")
+  ) : `<div class="empty">Nessuna coppia con almeno 3 partite.</div>`;
+  const pager = pages>1 ? `<button class="team-pager" data-pages="${pages}" title="${teamPage<pages-1?'Mostra le altre coppie':'Torna alle prime'}"><span class="chev">${teamPage<pages-1?'▾':'▴'}</span><span>${teamPage<pages-1?'Mostra altre':'Torna ai primi'}</span><span class="pg">${teamPage+1}/${pages}</span></button>` : "";
+  return {rows,pager};
+}
+
+/* Aggiorna SOLO la classifica team (niente re-render globale), con transizione fluida. */
+function renderTeamPage(){
+  const list=document.getElementById("teamList");
+  const pager=document.getElementById("teamPager");
+  if(!list)return;
+  const {rows,pager:pagerHtml}=buildTeamRanking(compute(MATCHES));
+  list.innerHTML=rows;
+  if(pager)pager.innerHTML=pagerHtml;
+  if(list.animate)list.animate([{opacity:0,transform:"translateY(6px)"},{opacity:1,transform:"none"}],{duration:220,easing:"cubic-bezier(.2,.8,.2,1)"});
+}
+
 function render(){
   const d=compute(MATCHES);
   window.__lastPlayers=d.allPlayers;
-  refreshDatalist(d.allPlayers);
+  refreshPlayerSelects(d.allPlayers);
 
   const kpiHtml=d.kpis.map((k,i)=>`<div class="kpi" style="animation-delay:${i*.07}s"><div class="v" data-count="${k.value}" style="color:${k.color}">0</div><div class="l">${k.label}</div></div>`).join("");
 
@@ -783,11 +830,9 @@ function render(){
     <div class="track"><i style="width:${s.pct};background:${s.color}"></i></div></div>`).join("")
     || `<div class="empty">Servono almeno 3 partite per coppia.</div>`;
 
-  const pairRankHtml=d.pairRank.map(c=>`
-    <div class="pair-row"><span class="pos">${c.rank}</span>
-    <span class="pteam"><b>${esc(c.names)}</b>${medalTag(c.rank)}</span>
-    <span class="wp">${c.wins}/${c.played}</span><span class="pct" style="color:${pctColor(c.winPct)}">${c.winPct}%</span></div>`).join("")
-    || `<div class="empty">Nessuna coppia con almeno 3 partite.</div>`;
+  // Classifica team paginata (costruita dalla funzione condivisa buildTeamRanking)
+  const _tr=buildTeamRanking(d);
+  const pairRankHtml=_tr.rows, teamPagerHtml=_tr.pager;
 
   const cardsHtml=d.cards.map(c=>`
     <div class="pcard">
@@ -796,7 +841,7 @@ function render(){
         <div class="badge" style="background:${c.color}">${esc(c.initial)}</div>
         <div><div class="nm">${esc(c.name)}</div><div class="pl">${c.played} partite giocate</div></div>
         <span style="flex:1"></span>
-        <div class="role" title="${esc(c.roleDetail)}" style="background:${c.roleBg};color:${c.roleColor}">${c.roleIcon} ${c.role}</div>
+        <div class="role" title="${esc(c.roleDetail)}" style="background:${c.roleBg};color:${c.roleColor}"><span class="role-ic">${c.roleIcon}</span> ${c.role}</div>
       </div>
       <div class="stats">
         <div class="stat"><div class="n" style="color:${c.color}">${c.winPct}%</div><div class="l">Win</div></div>
@@ -874,7 +919,8 @@ function render(){
       <h2 class="h2">👥 Classifica team</h2>
       <p class="sect-note" style="margin:8px 0 16px">Minimo 3 partite insieme</p>
       <div class="pair-head"><span>#</span><span>Team</span><span class="cc">V/G</span><span class="rr">Win%</span></div>
-      ${pairRankHtml}
+      <div id="teamList">${pairRankHtml}</div>
+      <div id="teamPager">${teamPagerHtml}</div>
     </div>
   </section>
 
@@ -943,10 +989,16 @@ function animateCounts(){
 }
 
 /* ---- datalist ---- */
-function refreshDatalist(players){
+function refreshPlayerSelects(players){
   const all=[...new Set([...(players||[]),...Object.keys(colorMap)])].sort((a,b)=>a.localeCompare(b));
-  const dl=document.getElementById("players");
-  dl.innerHTML=all.map(p=>`<option value="${esc(p)}">`).join("");
+  const opts=all.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join("");
+  ["b1","b2","r1","r2"].forEach((id,i)=>{
+    const sel=document.getElementById(id); if(!sel)return;
+    const prev=sel.value;                                   // preserva la scelta in corso
+    const ph=(i%2===0?"Giocatore 1":"Giocatore 2")+"…";
+    sel.innerHTML=`<option value="">${ph}</option>`+opts;
+    sel.value=(prev && all.includes(prev))?prev:"";
+  });
 }
 
 /* =====================================================================
@@ -990,6 +1042,16 @@ function tableSvg(){
   return s;
 }
 document.getElementById("introTable").innerHTML=tableSvg();
+
+/* favicon = il tavolo da biliardino dell'intro, su sfondo crema quadrato */
+(function setTableFavicon(){
+  const inner=tableSvg().replace(/^<svg[^>]*>/,"").replace(/<\/svg>\s*$/,"");
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">`
+    +`<rect width="300" height="300" rx="56" fill="#f4efe4"/>`
+    +`<g transform="translate(0,32)">${inner}</g></svg>`;
+  const link=document.getElementById("favicon");
+  if(link) link.href="data:image/svg+xml,"+encodeURIComponent(svg);
+})();
 
 let introTimer=null;
 function playIntro(){
@@ -1045,7 +1107,7 @@ function saveMatch(){
   const b1=clean(F.b1.value),b2=clean(F.b2.value),r1=clean(F.r1.value),r2=clean(F.r2.value);
   const bs=parseInt(F.bs.value||"0",10),rs=parseInt(F.rs.value||"0",10);
   const names=[b1,b2,r1,r2];
-  if(names.some(n=>!n)){msg("Inserisci tutti e 4 i giocatori.");return;}
+  if(names.some(n=>!n)){msg("Seleziona tutti e 4 i giocatori.");return;}
   const lower=names.map(n=>n.toLowerCase());
   if(new Set(lower).size!==4){msg("Ogni giocatore deve essere diverso.");return;}
   if(bs===rs){msg("Il risultato non può finire in parità.");return;}
@@ -1088,6 +1150,14 @@ document.getElementById("dash").addEventListener("click",e=>{
       MATCHES.splice(i,1); saveMatches(MATCHES); render(); toast("🗑️ Partita eliminata");
     }
   }
+});
+
+/* toggle pagina classifica team */
+document.getElementById("dash").addEventListener("click",e=>{
+  const b=e.target.closest(".team-pager"); if(!b)return;
+  const pages=+b.getAttribute("data-pages")||1;
+  teamPage=(teamPage+1)%pages;
+  renderTeamPage();   // aggiorna solo la classifica team, senza refresh globale
 });
 
 /* toast */
