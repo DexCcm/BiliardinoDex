@@ -386,6 +386,50 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
 .addplayer input[type=color]::-webkit-color-swatch{border:none;border-radius:9px}
 .addplayer .btn{padding:11px 16px}
 
+/* ============================================================
+   ESTRATTORE DI MATCH
+   ============================================================ */
+.ext-overlay{position:fixed;inset:0;z-index:75;display:none;overflow-y:auto;padding:26px 20px 60px;
+  background:radial-gradient(120% 90% at 50% -10%,#e7eef8 0%,#efe7f2 45%,#f4efe4 100%)}
+.ext-overlay.open{display:block;animation:fadeIn .25s ease both}
+.ext-inner{max-width:760px;margin:0 auto}
+.ext-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ext-sub{color:#77727f;font-weight:700;font-size:14px;line-height:1.5;margin:8px 0 22px;max-width:600px}
+.ext-pool{background:var(--card);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);margin-bottom:20px}
+.ext-pool-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;font-size:12px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px}
+.chipbtn{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:5px 12px;font-family:var(--font);font-weight:800;font-size:12px;color:#7a7585;margin-left:6px;transition:.12s}
+.chipbtn:hover{background:#f3ede1}
+.ext-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ext-chip{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:#fff;border-radius:22px;padding:7px 14px;font-family:var(--font);font-weight:800;font-size:14px;color:#b1abb8;transition:.15s}
+.ext-chip .dot{width:12px;height:12px;border-radius:50%;opacity:.3;transition:.15s}
+.ext-chip.on{color:var(--ink2);border-color:var(--gold);background:#fffaef}
+.ext-chip.on .dot{opacity:1}
+.ext-stage{position:relative;overflow:hidden;background:var(--card);border-radius:var(--radius);padding:30px 24px;box-shadow:var(--shadow);margin-bottom:22px}
+.ext-teams{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center}
+.ext-team{border-radius:20px;padding:20px 16px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.ext-team.blue{background:linear-gradient(150deg,#eaf1fc,#dce9fa)}
+.ext-team.red{background:linear-gradient(150deg,#fdecec,#fbdede)}
+.ext-team-lab{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.ext-team.blue .ext-team-lab{color:var(--blue)}
+.ext-team.red .ext-team-lab{color:var(--red)}
+.ext-slot{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.75);border-radius:16px;padding:10px 14px;width:100%;min-height:58px}
+.ext-slot .avatar{width:38px;height:38px;font-size:15px}
+.ext-slot b{font-family:var(--display);font-weight:700;font-size:18px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ext-slot.pop{animation:pop .4s cubic-bezier(.2,1.4,.5,1) both}
+.ext-vs{font-family:var(--display);font-weight:700;font-size:24px;color:#b9b4c0;display:flex;align-items:center;justify-content:center;min-width:44px}
+.ext-vs .die{display:none;font-size:30px}
+.ext-stage.shuffling .ext-vs .txt{display:none}
+.ext-stage.shuffling .ext-vs .die{display:block;animation:spin .5s linear infinite}
+.ext-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.ext-actions .btn{padding:14px 26px;font-size:15px;flex:0 0 auto}
+.ext-msg{text-align:center;margin-top:14px;font-weight:800;color:var(--red);min-height:20px}
+.confetti{position:absolute;top:6px;width:9px;height:14px;border-radius:2px;opacity:0;pointer-events:none;animation:confFall 1.2s ease-in forwards}
+@keyframes confFall{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--dx),300px) rotate(560deg)}}
+@media (max-width:560px){
+  .ext-teams{grid-template-columns:1fr;gap:12px}
+  .ext-vs{transform:rotate(90deg);margin:2px 0}
+}
+
 /* toast */
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:80;
   background:#3b3c46;color:#fff;font-weight:800;font-size:14px;padding:14px 22px;border-radius:30px;
@@ -489,6 +533,7 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
       </div>
       <div class="spacer"></div>
       <button class="btn primary" id="addBtnTop"><span class="icon-only">＋</span><span class="lbl">＋ Nuova partita</span></button>
+      <button class="btn ghost" id="extractBtn" title="Estrai match"><span class="icon-only">🎲</span><span class="lbl">🎲 Estrai match</span></button>
       <button class="btn ghost" id="playersBtn" title="Giocatori"><span class="icon-only">👥</span><span class="lbl">👥 Giocatori</span></button>
       <button class="btn ghost" id="replayBtn" title="Rivedi intro"><span class="icon-only">↺</span><span class="lbl">↺ Rivedi intro</span></button>
     </div>
@@ -559,6 +604,47 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
     <div class="modal-actions">
       <button class="btn" id="playersClose">Chiudi</button>
     </div>
+  </div>
+</div>
+
+<!-- ============ ESTRATTORE DI MATCH (pagina dedicata) ============ -->
+<div id="extractor" class="ext-overlay">
+  <div class="ext-inner">
+    <div class="ext-head">
+      <h2 class="h2">🎲 Estrattore di match</h2>
+      <button class="btn ghost" id="extClose">✕ Chiudi</button>
+    </div>
+    <p class="ext-sub">Chi c'è oggi? Seleziona i presenti, poi estrai la prossima partita. Il sorteggio è quasi tutto casuale, con una piccola spinta verso le coppie che hanno giocato meno insieme.</p>
+
+    <div class="ext-pool">
+      <div class="ext-pool-head">
+        <span>Giocatori disponibili</span>
+        <div><button class="chipbtn" id="extAll">Tutti</button><button class="chipbtn" id="extNone">Nessuno</button></div>
+      </div>
+      <div class="ext-chips" id="extChips"></div>
+    </div>
+
+    <div class="ext-stage" id="extStage">
+      <div class="ext-teams">
+        <div class="ext-team blue">
+          <div class="ext-team-lab">🔵 Blu</div>
+          <div class="ext-slot" data-slot="b1"></div>
+          <div class="ext-slot" data-slot="b2"></div>
+        </div>
+        <div class="ext-vs"><span class="txt">VS</span><span class="die">🎲</span></div>
+        <div class="ext-team red">
+          <div class="ext-team-lab">🔴 Rosso</div>
+          <div class="ext-slot" data-slot="r1"></div>
+          <div class="ext-slot" data-slot="r2"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ext-actions">
+      <button class="btn primary" id="extBtn">🎲 Estrai match</button>
+      <button class="btn save" id="extUse" style="display:none">Usa nel form partita</button>
+    </div>
+    <div class="ext-msg" id="extMsg"></div>
   </div>
 </div>
 
@@ -1214,6 +1300,135 @@ byId("npAdd").addEventListener("click",()=>{
   byId("npName").value=""; renderPlayersList(); pmsg("Giocatore aggiunto ✓",true);
 });
 byId("npName").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();byId("npAdd").click();}});
+
+/* =====================================================================
+   ESTRATTORE DI MATCH
+   ===================================================================== */
+const extractor=document.getElementById("extractor");
+let extSelected=null, extBusy=false, extResult=null;
+const W_HIST=0.35;   // peso della "freschezza" (35%); il resto (65%) è puro caso
+
+function extMsg(t){const m=byId("extMsg");if(m)m.textContent=t||"";}
+
+/* quante volte due giocatori hanno giocato insieme (in coppia) */
+function pairPlayedMap(){
+  const m={};
+  MATCHES.forEach(x=>{
+    const add=(a,b)=>{const k=[a,b].sort().join("|");m[k]=(m[k]||0)+1;};
+    if(x.blue&&x.blue.length===2)add(x.blue[0],x.blue[1]);
+    if(x.red&&x.red.length===2)add(x.red[0],x.red[1]);
+  });
+  return m;
+}
+const pairPlayed=(m,a,b)=>m[[a,b].sort().join("|")]||0;
+
+/* tutte le partite possibili (4 giocatori → 2 coppie) tra i presenti */
+function enumerateMatches(pool){
+  const res=[];
+  for(let i=0;i<pool.length;i++)for(let j=i+1;j<pool.length;j++)
+   for(let k=j+1;k<pool.length;k++)for(let l=k+1;l<pool.length;l++){
+     const f=[pool[i],pool[j],pool[k],pool[l]];
+     [[[0,1],[2,3]],[[0,2],[1,3]],[[0,3],[1,2]]].forEach(p=>{
+       res.push({A:[f[p[0][0]],f[p[0][1]]],B:[f[p[1][0]],f[p[1][1]]]});
+     });
+   }
+  return res;
+}
+
+/* sorteggio pesato: 65% caso + 35% verso le coppie meno "usate" */
+function pickWeightedMatch(pool){
+  const pm=pairPlayedMap();
+  const cands=enumerateMatches(pool);
+  cands.forEach(c=>{c.hist=pairPlayed(pm,c.A[0],c.A[1])+pairPlayed(pm,c.B[0],c.B[1]);});
+  const hs=cands.map(c=>c.hist), maxH=Math.max(...hs), minH=Math.min(...hs);
+  cands.forEach(c=>{const fresh=maxH===minH?1:(maxH-c.hist)/(maxH-minH);c.score=(1-W_HIST)+W_HIST*fresh;});
+  let tot=cands.reduce((s,c)=>s+c.score,0), r=Math.random()*tot, chosen=cands[cands.length-1];
+  for(const c of cands){r-=c.score;if(r<=0){chosen=c;break;}}
+  // lato blu/rosso a caso
+  const blue=Math.random()<0.5?chosen.A:chosen.B;
+  const red=blue===chosen.A?chosen.B:chosen.A;
+  return {blue,red};
+}
+
+function extSlotHtml(name){
+  if(!name)return `<span class="avatar" style="background:#d8d2c4">?</span><b style="color:#c3bdca">—</b>`;
+  return `<span class="avatar" style="background:${colorFor(name)}">${esc(name[0])}</span><b>${esc(name)}</b>`;
+}
+function setSlot(sel,name){const el=document.querySelector(`[data-slot="${sel}"]`);if(el)el.innerHTML=extSlotHtml(name);}
+
+function renderExtChips(){
+  const wrap=byId("extChips"); if(!wrap)return;
+  const roster=currentRoster();
+  wrap.innerHTML=roster.map(n=>`<button class="ext-chip ${extSelected.has(n)?"on":""}" data-p="${esc(n)}"><span class="dot" style="background:${colorFor(n)}"></span>${esc(n)}</button>`).join("")
+    || `<div class="empty">Nessun giocatore in anagrafica.</div>`;
+}
+function resetStage(){
+  ["b1","b2","r1","r2"].forEach(s=>setSlot(s,null));
+  const st=byId("extStage"); st.classList.remove("revealed","shuffling");
+  extResult=null; byId("extUse").style.display="none"; byId("extBtn").textContent="🎲 Estrai match";
+}
+function openExtractor(){
+  if(!extSelected)extSelected=new Set(currentRoster());   // primo avvio: tutti selezionati
+  renderExtChips(); resetStage(); extMsg("");
+  extractor.classList.add("open");
+}
+function closeExtractor(){extractor.classList.remove("open");}
+
+byId("extractBtn").addEventListener("click",openExtractor);
+byId("extClose").addEventListener("click",closeExtractor);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&extractor.classList.contains("open"))closeExtractor();});
+
+byId("extChips").addEventListener("click",e=>{
+  const c=e.target.closest(".ext-chip"); if(!c)return;
+  const n=c.getAttribute("data-p");
+  if(extSelected.has(n))extSelected.delete(n); else extSelected.add(n);
+  renderExtChips();
+});
+byId("extAll").addEventListener("click",()=>{extSelected=new Set(currentRoster());renderExtChips();});
+byId("extNone").addEventListener("click",()=>{extSelected=new Set();renderExtChips();});
+
+function burstConfetti(){
+  const stage=byId("extStage"); const cols=["#f2b721","#6f9fe0","#ec8f8f","#6bbf7b","#b48ce0"];
+  for(let i=0;i<18;i++){
+    const c=document.createElement("i"); c.className="confetti";
+    c.style.left=(15+Math.random()*70)+"%"; c.style.background=cols[i%cols.length];
+    c.style.animationDelay=(Math.random()*.18)+"s"; c.style.setProperty("--dx",(Math.random()*180-90)+"px");
+    stage.appendChild(c); setTimeout(()=>c.remove(),1500);
+  }
+}
+
+function extractMatch(){
+  if(extBusy)return;
+  const pool=[...extSelected];
+  if(pool.length<4){extMsg("Servono almeno 4 giocatori selezionati.");return;}
+  extMsg("");
+  extBusy=true; byId("extBtn").disabled=true; byId("extUse").style.display="none";
+  const st=byId("extStage"); st.classList.remove("revealed"); st.classList.add("shuffling");
+  const res=pickWeightedMatch(pool);
+  const slots=["b1","b2","r1","r2"];
+  let delay=55;
+  (function tick(){
+    slots.forEach(s=>setSlot(s,pool[Math.floor(Math.random()*pool.length)]));
+    delay*=1.14;
+    if(delay<300)setTimeout(tick,delay);
+    else{
+      const map={b1:res.blue[0],b2:res.blue[1],r1:res.red[0],r2:res.red[1]};
+      slots.forEach(s=>{setSlot(s,map[s]);const el=document.querySelector(`[data-slot="${s}"]`);el.classList.remove("pop");void el.offsetWidth;el.classList.add("pop");});
+      st.classList.remove("shuffling"); st.classList.add("revealed");
+      extResult=res; byId("extUse").style.display=""; byId("extBtn").textContent="🎲 Estrai ancora";
+      extBusy=false; byId("extBtn").disabled=false;
+      burstConfetti();
+    }
+  })();
+}
+byId("extBtn").addEventListener("click",extractMatch);
+
+byId("extUse").addEventListener("click",()=>{
+  if(!extResult)return;
+  closeExtractor(); openModal();
+  F.b1.value=extResult.blue[0]; F.b2.value=extResult.blue[1];
+  F.r1.value=extResult.red[0];  F.r2.value=extResult.red[1];
+});
 
 /* =====================================================================
    BOOT
