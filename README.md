@@ -16,9 +16,10 @@ in tempo reale via **Firebase Realtime Database**.
 - **🏆 Classifica giocatori** e **👥 Classifica team** — con medaglie 🥇🥈🥉 ai primi 3 e Win% a scala di colore
 - **🐐 Team più forte / Team sfortunato**
 - **⚽ Gol fatti** e **🧤 Gol subiti** per coppia
-- **Schede giocatori** — win%, forma, ruolo (difesa/attacco/jolly), miglior partner
+- **Schede giocatori** — win%, forma (ultime 5), ruolo (difesa/attacco/jolly), miglior partner
 - **😭 Valle di lacrime** — i "cappotti" (partite chiuse a zero)
-- **Registrazione partite** con validazioni e autocompletamento dei nomi
+- **🎲 Estrattore di match** — pagina dedicata che sorteggia la prossima partita tra i presenti, con un sorteggio quasi tutto casuale ma che favorisce leggermente le coppie che hanno giocato meno insieme (animazioni a tema)
+- **Registrazione partite** con validazioni e scelta giocatori da menu a tendina (solo censiti)
 - **👥 Gestione giocatori** — aggiunta e ricolorazione senza toccare la Console Firebase
 - **Sync live multi-utente** — ogni modifica appare in tempo reale su tutti i dispositivi
 - **Intro animata** e layout responsive (desktop / tablet / mobile)
