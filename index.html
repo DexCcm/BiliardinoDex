@@ -310,7 +310,7 @@ section{animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
 
 /* all matches */
 .alllist{max-height:460px;overflow-y:auto;padding-right:6px;display:flex;flex-direction:column;gap:8px}
-.mall{display:grid;grid-template-columns:34px 1fr auto 1fr 26px;gap:12px;align-items:center;padding:11px 14px;border-radius:14px;position:relative}
+.mall{display:grid;grid-template-columns:34px 1fr auto 1fr;gap:12px;align-items:center;padding:11px 14px;border-radius:14px;position:relative}
 .mall .n{font-family:var(--display);font-weight:700;font-size:13px;color:#c3bdca}
 .mall .t{font-weight:700;font-size:14px}
 .mall .t.l{text-align:right}.mall .t.r{text-align:left}
@@ -419,7 +419,7 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
   .tri .l,.tri .r{font-size:18px}
   .rank-head,.rank-row{grid-template-columns:26px 1fr 40px 46px;}
   .rank-head .col-played,.rank-row .p{display:none}
-  .mall{grid-template-columns:26px 1fr auto 1fr 22px;gap:8px}
+  .mall{grid-template-columns:26px 1fr auto 1fr;gap:8px}
   .brand .s{display:none}
   /* iOS non zooma al focus se il testo del campo è >= 16px */
   .pick input,.pick select,.addplayer input[type=text],#npName{font-size:16px}
@@ -871,7 +871,6 @@ function render(){
       <div class="t l" style="color:${m.blueColor}">${esc(m.blue)}</div>
       <div class="sc"><span style="color:${m.blueColor};font-weight:${m.blueWeight}">${m.bs}</span><span class="sep">–</span><span style="color:${m.redColor};font-weight:${m.redWeight}">${m.rs}</span></div>
       <div class="t r" style="color:${m.redColor}">${esc(m.red)}</div>
-      <button class="del" data-del="${m.idx}" title="Elimina partita">×</button>
     </div>`).join("");
 
   const dash=document.getElementById("dash");
@@ -964,7 +963,7 @@ function render(){
 
   <!-- TUTTI I RISULTATI -->
   <section class="panel" style="animation-delay:.28s">
-    <div class="sect-head"><h2 class="h2">Tutti i risultati</h2><span class="sect-note">${d.totalMatches} partite · passa sopra per eliminare</span></div>
+    <div class="sect-head"><h2 class="h2">Tutti i risultati</h2><span class="sect-note">${d.totalMatches} partite</span></div>
     <div class="alllist">${allHtml}</div>
   </section>`;
 
@@ -1134,23 +1133,6 @@ function clean(s){return (s||"").trim().replace(/\s+/g," ");}
 byId("saveBtn").addEventListener("click",saveMatch);
 [F.b1,F.b2,F.r1,F.r2].forEach(el=>el.addEventListener("keydown",e=>{if(e.key==="Enter")F.saveNext&&F.saveNext();}));
 overlay.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.tagName==="INPUT"&&e.target.type!=="number"){/* let Enter move on */}});
-
-/* delete match (event delegation) */
-document.getElementById("dash").addEventListener("click",e=>{
-  const btn=e.target.closest("[data-del]"); if(!btn)return;
-  const raw=btn.getAttribute("data-del");
-  const m = MATCHES.find(x=>x._key!=null && String(x._key)===raw) || MATCHES[+raw];
-  if(!m)return;
-  if(confirm(`Eliminare la partita ${m.blue.join(" & ")} ${m.bs}–${m.rs} ${m.red.join(" & ")}?`)){
-    if(window.dbRemove && m._key!=null){
-      window.dbRemove(m._key);   // elimina su Firebase → onValue ri-renderizza per tutti
-      toast("🗑️ Partita eliminata");
-    }else{
-      const i=MATCHES.indexOf(m);
-      MATCHES.splice(i,1); saveMatches(MATCHES); render(); toast("🗑️ Partita eliminata");
-    }
-  }
-});
 
 /* toggle pagina classifica team */
 document.getElementById("dash").addEventListener("click",e=>{
