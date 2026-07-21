@@ -657,8 +657,8 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
 const STORAGE_KEY = "bigliardino_dex_matches_v1";
 
 /* ---- known players styling ---- */
-const colorMap = { Leo:"#e08f5a", Gabri:"#b48ce0", Simo:"#4fb0a0", Silvia:"#e78bb4", Damiano:"#7f9bd0", Albe:"#6fbf7b", Samuela:"#c9a26a", Parini:"#9a95a5" };
-const tintMap  = { Leo:"#f7e6d8", Gabri:"#efe4f8", Simo:"#dcf1ed", Silvia:"#fae0ec", Damiano:"#e3eafa", Albe:"#e0f4e3", Samuela:"#f3ebdc", Parini:"#eeecf0" };
+const colorMap = { Leo:"#e08f5a", Gabri:"#b48ce0", Simo:"#4fb0a0", Silvia:"#e78bb4", Damiano:"#7f9bd0", Albe:"#6fbf7b", Samuela:"#c9a26a" };
+const tintMap  = { Leo:"#f7e6d8", Gabri:"#efe4f8", Simo:"#dcf1ed", Silvia:"#fae0ec", Damiano:"#e3eafa", Albe:"#e0f4e3", Samuela:"#f3ebdc" };
 const FALLBACK = ["#e08f5a","#b48ce0","#4fb0a0","#e78bb4","#7f9bd0","#6fbf7b","#c9a26a","#d17f9e","#5f9bd0","#cf9b6a"];
 
 function hashIdx(name,len){let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))>>>0;return h%len;}
