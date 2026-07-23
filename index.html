@@ -658,7 +658,7 @@ const STORAGE_KEY = "bigliardino_dex_matches_v1";
 
 /* ---- known players styling ---- */
 const colorMap = { Leo:"#e08f5a", Gabri:"#b48ce0", Simo:"#4fb0a0", Silvia:"#e78bb4", Damiano:"#7f9bd0", Albe:"#6fbf7b", Samuela:"#c9a26a" };
-const tintMap  = { Leo:"#f7e6d8", Gabri:"#efe4f8", Simo:"#dcf1ed", Silvia:"#fae0ec", Damiano:"#e3eafa", Albe:"#e0f4e3", Samuela:"#f3ebdc" };
+const tintMap  = { Leo:"#f7e6d8", Gabri:"#efe4f8", Simo:"#dcf1ed", Silvia:"#fae0ec", Damiano:"#e3eafa", Albe:"#e0f4e3", Samuela:"#f3ebdc"};
 const FALLBACK = ["#e08f5a","#b48ce0","#4fb0a0","#e78bb4","#7f9bd0","#6fbf7b","#c9a26a","#d17f9e","#5f9bd0","#cf9b6a"];
 
 function hashIdx(name,len){let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))>>>0;return h%len;}
@@ -1446,6 +1446,7 @@ else { playIntro(); }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import { getDatabase, ref, onValue, push, remove, set } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCYJ4EmYji3qdZ4uoRIopLbyOLGcl6tJfc",
@@ -1461,6 +1462,7 @@ const firebaseConfig = {
 try{
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
+  const auth = getAuth(app);
   const rootRef    = ref(db, "/");
   const matchesRef = ref(db, "matches");
 
@@ -1470,31 +1472,43 @@ try{
   window.dbSetPlayer    = (name, obj) => set(ref(db, "players/" + name), obj);
   window.dbRemovePlayer = (name) => remove(ref(db, "players/" + name));
 
-  let seeded = false;
+  let seeded = false, subscribed = false;
   // Ascolta l'intero database: legge insieme `players` (anagrafica) e `matches` (partite)
-  onValue(rootRef, (snap) => {
-    const val = snap.val() || {};
+  function subscribe(){
+    if (subscribed) return; subscribed = true;
+    onValue(rootRef, (snap) => {
+      const val = snap.val() || {};
 
-    // 1) Anagrafica giocatori → arricchisce colori/stili prima del render
-    if (val.players) window.applyRemotePlayers(val.players);
+      // 1) Anagrafica giocatori → arricchisce colori/stili prima del render
+      if (val.players) window.applyRemotePlayers(val.players);
 
-    // 2) Partite
-    if (val.matches == null) {
-      // DB vuoto: al primo avvio in assoluto carica il seed (anagrafica + torneo)
-      if (!seeded) {
-        seeded = true;
-        if (val.players == null && window.getPlayersSeed) set(ref(db, "players"), window.getPlayersSeed());
-        (window.getSeed ? window.getSeed() : []).forEach(rec => push(matchesRef, rec));
+      // 2) Partite
+      if (val.matches == null) {
+        // DB vuoto: al primo avvio in assoluto carica il seed (anagrafica + torneo)
+        if (!seeded) {
+          seeded = true;
+          if (val.players == null && window.getPlayersSeed) set(ref(db, "players"), window.getPlayersSeed());
+          (window.getSeed ? window.getSeed() : []).forEach(rec => push(matchesRef, rec));
+        }
+        return;
       }
-      return;
-    }
-    // Object.entries mantiene l'ordine cronologico delle push-key
-    const arr = Object.entries(val.matches).map(([k, v]) => ({ ...v, _key: k }));
-    window.applyRemoteMatches(arr);
-  }, (err) => {
-    console.error("Firebase RTDB error:", err);
-    const s = document.getElementById("syncStatus");
-    if (s) s.textContent = "Firebase non raggiungibile · dati locali";
+      // Object.entries mantiene l'ordine cronologico delle push-key
+      const arr = Object.entries(val.matches).map(([k, v]) => ({ ...v, _key: k }));
+      window.applyRemoteMatches(arr);
+    }, (err) => {
+      console.error("Firebase RTDB error:", err);
+      const s = document.getElementById("syncStatus");
+      if (s) s.textContent = "Firebase non raggiungibile · dati locali";
+    });
+  }
+
+  // Autenticazione anonima: permette regole "auth != null" (niente accesso pubblico → l'avviso Firebase sparisce).
+  // Il listener parte quando l'auth è pronta. Se il provider Anonimo non è (ancora) abilitato,
+  // fa comunque fallback e si collega, così l'app continua a funzionare con le regole attuali.
+  onAuthStateChanged(auth, (user) => { if (user) subscribe(); });
+  signInAnonymously(auth).catch((err) => {
+    console.warn("Auth anonima non attiva:", err && err.code, "· uso le regole correnti");
+    subscribe();
   });
 }catch(e){
   console.error("Firebase init fallita, uso localStorage:", e);
