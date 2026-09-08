@@ -1312,7 +1312,8 @@ byId("npName").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefau
    ===================================================================== */
 const extractor=document.getElementById("extractor");
 let extSelected=null, extBusy=false, extResult=null;
-const W_HIST=0.35;   // peso della "freschezza" (35%); il resto (65%) è puro caso
+// Pesi del matching (somma = 1): bilanciamento forma 50% · freschezza coppie 25% · caso 25%
+const W_FORM=0.50, W_FRESH=0.25, W_RAND=0.25;
 
 function extMsg(t){const m=byId("extMsg");if(m)m.textContent=t||"";}
 
@@ -1328,6 +1329,20 @@ function pairPlayedMap(){
 }
 const pairPlayed=(m,a,b)=>m[[a,b].sort().join("|")]||0;
 
+/* forma = % di vittorie nelle ultime 5 partite di ogni giocatore, in [0,1] */
+function formMap(){
+  const seq={};
+  MATCHES.forEach(m=>{
+    const bWon=m.bs>m.rs;
+    (m.blue||[]).forEach(n=>{(seq[n]||(seq[n]=[])).push(bWon?1:0);});
+    (m.red ||[]).forEach(n=>{(seq[n]||(seq[n]=[])).push(bWon?0:1);});
+  });
+  const f={};
+  Object.keys(seq).forEach(n=>{const last=seq[n].slice(-5);f[n]=last.length?last.reduce((a,b)=>a+b,0)/last.length:0.5;});
+  return f;
+}
+const formOf=(fm,n)=>(n in fm)?fm[n]:0.5;   // giocatore senza partite → forma neutra 0.5
+
 /* tutte le partite possibili (4 giocatori → 2 coppie) tra i presenti */
 function enumerateMatches(pool){
   const res=[];
@@ -1341,18 +1356,28 @@ function enumerateMatches(pool){
   return res;
 }
 
-/* sorteggio pesato: 65% caso + 35% verso le coppie meno "usate" */
+/* Matching: bilanciamento forma (50%) + freschezza coppie (25%) + caso (25%).
+   Ruolo difesa/attacco e colore squadra completamente casuali. */
 function pickWeightedMatch(pool){
-  const pm=pairPlayedMap();
+  const pm=pairPlayedMap(), fm=formMap();
   const cands=enumerateMatches(pool);
-  cands.forEach(c=>{c.hist=pairPlayed(pm,c.A[0],c.A[1])+pairPlayed(pm,c.B[0],c.B[1]);});
+  cands.forEach(c=>{
+    c.hist=pairPlayed(pm,c.A[0],c.A[1])+pairPlayed(pm,c.B[0],c.B[1]);
+    const fa=formOf(fm,c.A[0])+formOf(fm,c.A[1]), fb=formOf(fm,c.B[0])+formOf(fm,c.B[1]);
+    c.formDiff=Math.abs(fa-fb);   // piccola = squadre equilibrate (più vittorie con meno vittorie)
+  });
   const hs=cands.map(c=>c.hist), maxH=Math.max(...hs), minH=Math.min(...hs);
-  cands.forEach(c=>{const fresh=maxH===minH?1:(maxH-c.hist)/(maxH-minH);c.score=(1-W_HIST)+W_HIST*fresh;});
-  let tot=cands.reduce((s,c)=>s+c.score,0), r=Math.random()*tot, chosen=cands[cands.length-1];
-  for(const c of cands){r-=c.score;if(r<=0){chosen=c;break;}}
-  // lato blu/rosso a caso
-  const blue=Math.random()<0.5?chosen.A:chosen.B;
-  const red=blue===chosen.A?chosen.B:chosen.A;
+  const ds=cands.map(c=>c.formDiff), maxD=Math.max(...ds), minD=Math.min(...ds);
+  const fresh  = x => maxH===minH?1:(maxH-x)/(maxH-minH);   // coppie meno usate = 1
+  const balance= x => maxD===minD?1:(maxD-x)/(maxD-minD);   // squadre più equilibrate = 1
+  cands.forEach(c=>{ c.score = W_FORM*balance(c.formDiff) + W_FRESH*fresh(c.hist) + W_RAND*Math.random(); });
+  // candidato con punteggio massimo (il termine casuale fa variare l'esito)
+  let chosen=cands[0];
+  for(const c of cands) if(c.score>chosen.score) chosen=c;
+  // difesa/attacco casuale dentro ogni coppia, poi colore squadra casuale
+  const shuf=p=>Math.random()<0.5?[p[0],p[1]]:[p[1],p[0]];
+  const A=shuf(chosen.A), B=shuf(chosen.B);
+  const blue=Math.random()<0.5?A:B, red=(blue===A)?B:A;
   return {blue,red};
 }
 
