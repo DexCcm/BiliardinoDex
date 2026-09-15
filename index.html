@@ -435,6 +435,141 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
   .ext-vs{transform:rotate(90deg);margin:2px 0}
 }
 
+/* ============================================================
+   MODE SELECT (schermata iniziale: modalità attuale / campionato)
+   ============================================================ */
+#modeSelect{position:fixed;inset:0;z-index:58;display:none;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(120% 90% at 50% -10%,#cfe0f2 0%,#e7ddf0 45%,#f6ecdd 100%)}
+#modeSelect.open{display:flex;animation:fadeIn .3s ease both}
+.ms-inner{width:100%;max-width:760px;text-align:center}
+.ms-title{font-family:var(--display);font-weight:700;font-size:clamp(26px,5vw,40px);color:var(--ink);margin:0 0 6px}
+.ms-title b{color:#f2b90d}
+.ms-sub{color:#77727f;font-weight:700;font-size:15px;margin:0 0 30px}
+.ms-cards{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.ms-card{border:none;cursor:pointer;text-align:left;border-radius:26px;padding:30px 26px;color:#fff;position:relative;overflow:hidden;
+  box-shadow:0 16px 40px rgba(80,70,60,.18);transition:.2s;animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+.ms-card:hover{transform:translateY(-5px);box-shadow:0 22px 50px rgba(80,70,60,.26)}
+.ms-card.current{background:linear-gradient(150deg,#6f9fe0,#3f6fb5)}
+.ms-card.champ{background:linear-gradient(150deg,#f2c94c,#e6a41a);animation-delay:.08s}
+.ms-card .ms-ic{font-size:44px;line-height:1;display:block;margin-bottom:14px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2))}
+.ms-card h3{font-family:var(--display);font-weight:700;font-size:23px;margin:0 0 6px;color:#fff}
+.ms-card p{font-size:14px;font-weight:700;line-height:1.45;margin:0;color:rgba(255,255,255,.9)}
+.ms-card .ms-go{margin-top:16px;font-weight:800;font-size:13px;letter-spacing:.5px;display:inline-flex;align-items:center;gap:6px;color:#fff}
+.ms-card .ms-deco{position:absolute;right:-24px;bottom:-30px;font-size:120px;opacity:.16;transform:rotate(-12deg);pointer-events:none}
+@media (max-width:560px){.ms-cards{grid-template-columns:1fr}}
+
+/* ============================================================
+   TAB BAR
+   ============================================================ */
+[hidden]{display:none!important}
+.tabbar{position:relative;z-index:39;background:rgba(244,239,228,.9);border-bottom:1px solid var(--line)}
+.tabbar-in{max-width:1180px;margin:0 auto;padding:0 24px;display:flex;gap:6px;align-items:stretch}
+.tab{border:none;background:transparent;font-family:var(--font);font-weight:800;font-size:14px;color:var(--muted);
+  padding:14px 16px;display:inline-flex;align-items:center;gap:8px;border-bottom:3px solid transparent;transition:.15s;white-space:nowrap}
+.tab:hover{color:var(--ink2)}
+.tab.active{color:var(--ink)}
+.tab.active.t-dash{border-bottom-color:var(--blue)}
+.tab.active.t-champ{border-bottom-color:var(--gold)}
+.tab.active.t-albo{border-bottom-color:var(--purple)}
+.tab .ti{font-size:17px}
+.tab .badge-n{font-size:11px;font-weight:800;background:#efe8db;color:var(--muted2);border-radius:20px;padding:1px 7px}
+.tabbar .spacer{flex:1}
+.tab.modeswap{color:var(--muted2);font-weight:800;font-size:12px}
+@media (max-width:680px){.tabbar-in{padding:0 10px}.tab{padding:12px 10px;font-size:13px}.tab .lbl2{display:none}}
+
+/* ============================================================
+   CAMPIONATO
+   ============================================================ */
+.champ-hero{background:linear-gradient(150deg,#fff6e0,#f7ead0);border-radius:var(--radius);padding:26px 28px;box-shadow:var(--shadow);margin-bottom:24px;position:relative;overflow:hidden}
+.champ-hero .deco{position:absolute;right:-18px;top:-24px;font-size:120px;opacity:.12;transform:rotate(-10deg);pointer-events:none}
+.champ-hero h2{font-family:var(--display);font-weight:700;font-size:26px;color:var(--ink);margin:0 0 4px}
+.champ-hero .meta{font-size:13px;font-weight:700;color:#b08a2e}
+.fmt-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.fmt-badge{font-size:12px;font-weight:800;background:#fff;border:1px solid #eeddb8;color:#a9751a;border-radius:20px;padding:6px 12px}
+.champ-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.progress-wrap{margin-top:18px}
+.progress-top{display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:#a9751a;margin-bottom:6px}
+.progress-track{height:16px;border-radius:10px;background:#f0e3c6;overflow:hidden;box-shadow:inset 0 2px 4px rgba(120,90,20,.12)}
+.progress-track>i{display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,#f2c94c,#e6a41a);transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.champ-setup{max-width:520px}
+.champ-setup .lead{font-size:14px;font-weight:700;color:var(--muted);margin:6px 0 18px}
+.champ-setup input[type=text]{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px 14px;font-family:var(--font);font-weight:700;font-size:16px;color:var(--ink2);margin-bottom:16px}
+.champ-setup input[type=text]:focus{outline:none;border-color:var(--gold)}
+.roster-pick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.next-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:24px}
+.next-stage{position:relative;overflow:hidden}
+.next-teams{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin:6px 0 18px}
+.nt-team{border-radius:18px;padding:16px 12px;display:flex;flex-direction:column;gap:8px}
+.nt-team.t1{background:linear-gradient(150deg,#eef4fc,#e2ecf9)}
+.nt-team.t2{background:linear-gradient(150deg,#f3f0e6,#ece6d6)}
+.nt-slot{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.8);border-radius:14px;padding:9px 12px;min-height:52px}
+.nt-slot .avatar{width:34px;height:34px;font-size:14px}
+.nt-slot .rl{font-size:10px;font-weight:800;text-transform:uppercase;color:var(--muted2);letter-spacing:.5px}
+.nt-slot b{font-family:var(--display);font-weight:700;font-size:16px;color:var(--ink)}
+.nt-vs{font-family:var(--display);font-weight:700;font-size:20px;color:#c3bdca;text-align:center}
+.score-entry{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.champ-empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.champ-empty .big{font-size:56px;margin-bottom:10px}
+.champ-empty b{color:var(--ink2)}
+/* rendimento per ruolo (difesa/attacco) */
+.rp-head,.rp-row{display:grid;grid-template-columns:1fr 92px 92px;gap:10px;align-items:center}
+.rp-head{padding:0 12px 10px;font-size:11px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.3px;text-align:center}
+.rp-head span:first-child{text-align:left}
+.rp-row{padding:9px 12px;border-radius:14px;transition:.15s}
+.rp-row:hover{background:#f3ede1}
+.rp-row .who{display:flex;align-items:center;gap:10px;min-width:0}
+.rp-row .who b{color:var(--ink2);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-cell{text-align:center;font-family:var(--display);font-weight:700;font-size:16px;line-height:1.1}
+.rp-cell .rp-sub{font-family:var(--font);font-size:11px;font-weight:700;color:var(--muted2);margin-top:2px}
+/* combinazioni espandibili */
+.combos{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.combos>summary{list-style:none;cursor:pointer;padding:22px 26px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.combos>summary::-webkit-details-marker{display:none}
+.combos>summary .h2{font-family:var(--display);font-weight:700;font-size:22px;color:var(--ink);margin:0}
+.combos>summary .cs-note{font-size:13px;font-weight:800;color:var(--muted2);margin-left:auto;margin-right:10px}
+.combos>summary .chev{font-size:13px;color:var(--muted);transition:.2s}
+.combos[open]>summary .chev{transform:rotate(180deg)}
+.combos-body{max-height:440px;overflow-y:auto;padding:0 20px 20px;display:flex;flex-direction:column;gap:6px}
+.combo{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:9px 12px;border-radius:12px;background:#faf6ee}
+.combo.played{background:#eaf6ec}
+.combo .cn{font-family:var(--display);font-weight:700;color:#c3bdca;font-size:12px}
+.combo .teams{font-weight:700;color:var(--ink2);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.combo .teams .rr{color:var(--muted2);font-weight:800;font-size:10px;text-transform:uppercase}
+.combo .res{font-family:var(--display);font-weight:700;font-size:14px;color:#4e9b64}
+.combo .res.todo{color:#c9c3d0;font-family:var(--font);font-weight:700;font-size:12px}
+/* pulsante cambio modalità in header */
+.btn.mode{background:linear-gradient(135deg,#b48ce0,#8a5fc0);color:#fff;border:none;box-shadow:0 6px 16px rgba(138,95,192,.32)}
+.btn.mode:hover{box-shadow:0 8px 22px rgba(138,95,192,.42)}
+
+/* ============================================================
+   ALBO D'ORO / BACHECA TROFEI
+   ============================================================ */
+.albo-hero{text-align:center;padding:14px 0 26px}
+.albo-hero h2{font-family:var(--display);font-weight:700;font-size:clamp(26px,4vw,34px);color:var(--ink);margin:0}
+.albo-hero p{color:var(--muted);font-weight:700;font-size:14px;margin:6px 0 0}
+.trophies{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px}
+.trophy{position:relative;overflow:hidden;border-radius:24px;padding:26px 22px 24px;text-align:center;
+  background:linear-gradient(160deg,#fff8e6,#f6e7c0);box-shadow:0 14px 34px rgba(160,120,20,.16);border:1px solid #f0dfb0;
+  animation:rise .6s cubic-bezier(.2,.8,.2,1) both;transition:.2s}
+.trophy:hover{transform:translateY(-5px);box-shadow:0 20px 44px rgba(160,120,20,.24)}
+.trophy::before{content:"";position:absolute;top:-40%;left:-30%;width:60%;height:180%;transform:rotate(18deg);pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);animation:trophyShine 4s ease-in-out infinite}
+@keyframes trophyShine{0%{left:-40%}22%{left:130%}100%{left:130%}}
+.trophy .cup{font-size:52px;line-height:1;filter:drop-shadow(0 4px 6px rgba(160,120,20,.35));animation:cupBob 3s ease-in-out infinite}
+@keyframes cupBob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.05)}}
+.trophy .champ-av{width:56px;height:56px;border-radius:50%;margin:12px auto 8px;color:#fff;font-family:var(--display);font-weight:700;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(70,66,80,.25);border:3px solid #fff;position:relative;z-index:1}
+.trophy .champ-name{font-family:var(--display);font-weight:700;font-size:22px;color:#8a5a12;margin:0}
+.trophy .champ-role{font-size:12px;font-weight:800;color:#b08a2e;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.trophy .t-name{font-weight:800;font-size:13px;color:var(--ink2);margin-top:12px}
+.trophy .t-date{font-size:12px;font-weight:700;color:var(--muted2);margin-top:2px}
+.trophy .t-stats{display:flex;justify-content:center;gap:14px;margin-top:14px;padding-top:14px;border-top:1px solid #eeddb8}
+.trophy .t-stats div{font-size:12px;font-weight:700;color:#a9751a}
+.trophy .t-stats b{display:block;font-family:var(--display);font-size:18px;color:#8a5a12}
+.trophy .crown-badge{position:absolute;top:14px;right:16px;font-size:20px;animation:crownPulse 1.6s ease-in-out infinite;transform-origin:center}
+.albo-empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.albo-empty .big{font-size:64px;margin-bottom:12px;opacity:.7}
+.albo-empty b{color:var(--ink2)}
+
 /* toast */
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:80;
   background:#3b3c46;color:#fff;font-weight:800;font-size:14px;padding:14px 22px;border-radius:30px;
@@ -510,6 +645,30 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
   <button class="skip-btn" id="skipBtn">Salta ›</button>
 </div>
 
+<!-- ============ SCELTA MODALITÀ ============ -->
+<div id="modeSelect">
+  <div class="ms-inner">
+    <h1 class="ms-title">Bigliardino <b>dataexpert</b></h1>
+    <p class="ms-sub">Come vuoi giocare oggi?</p>
+    <div class="ms-cards">
+      <button class="ms-card current" id="modeCurrent">
+        <span class="ms-ic">⚽</span>
+        <h3>Continua con la modalità attuale</h3>
+        <p>Dashboard completa: classifiche, schede, statistiche e storico di tutte le partite.</p>
+        <span class="ms-go">Entra ›</span>
+        <span class="ms-deco">⚽</span>
+      </button>
+      <button class="ms-card champ" id="modeChamp">
+        <span class="ms-ic">🏆</span>
+        <h3>Campionato</h3>
+        <p>Tutte le combinazioni attacco/difesa, colore indipendente. 180 partite, poi si incorona il campione.</p>
+        <span class="ms-go">Entra ›</span>
+        <span class="ms-deco">🏆</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ APP ============ -->
 <div id="app" style="display:none">
   <header>
@@ -537,6 +696,7 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
         <span class="s">Torneo · 16 giu 2026</span>
       </div>
       <div class="spacer"></div>
+      <button class="btn mode" id="modeSwapHdr" title="Cambia modalità"><span class="icon-only">🔀</span><span class="lbl">🔀 Modalità</span></button>
       <button class="btn primary" id="addBtnTop"><span class="icon-only">＋</span><span class="lbl">＋ Nuova partita</span></button>
       <button class="btn ghost" id="extractBtn" title="Estrai match"><span class="icon-only">🎲</span><span class="lbl">🎲 Estrai match</span></button>
       <button class="btn ghost" id="playersBtn" title="Giocatori"><span class="icon-only">👥</span><span class="lbl">👥 Giocatori</span></button>
@@ -544,7 +704,17 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
     </div>
   </header>
 
+  <nav class="tabbar">
+    <div class="tabbar-in">
+      <button class="tab t-dash active" data-tab="dash"><span class="ti">📊</span><span class="lbl2">Dashboard</span></button>
+      <button class="tab t-champ" data-tab="champ"><span class="ti">🏆</span><span class="lbl2">Campionato</span></button>
+      <button class="tab t-albo" data-tab="albo"><span class="ti">🏅</span><span class="lbl2">Albo d'oro</span><span class="badge-n" id="alboCount" hidden>0</span></button>
+    </div>
+  </nav>
+
   <main id="dash"><!-- rendered by JS --></main>
+  <main id="champ" hidden><!-- rendered by JS --></main>
+  <main id="albo" hidden><!-- rendered by JS --></main>
 
   <footer>Bigliardino DEX · sinistra = Blu, destra = Rosso · <span id="syncStatus">dati sincronizzati in tempo reale</span></footer>
 </div>
@@ -864,6 +1034,29 @@ function rodsHtml(rods,pegSize){
   }).join("");
 }
 
+/* ---- scheda giocatore (condivisa dashboard + campionato) ---- */
+function playerCardHtml(c,leaderName){
+  return `
+    <div class="pcard">
+      <div class="tint" style="background:${c.tint}"></div>
+      <div class="row1">
+        <div class="badge${c.name===leaderName?" leader":""}" style="background:${c.color}">${c.name===leaderName?'<span class="crown" aria-label="Primo in classifica">👑</span>':''}${esc(c.initial)}</div>
+        <div><div class="nm">${esc(c.name)}</div><div class="pl">${c.played} partite giocate</div></div>
+        <span style="flex:1"></span>
+        <div class="role" title="${esc(c.roleDetail)}" style="background:${c.roleBg};color:${c.roleColor}"><span class="role-ic">${c.roleIcon}</span> ${c.role}</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="n" style="color:${c.color}">${c.winPct}%</div><div class="l">Win</div></div>
+        <div class="stat"><div class="n" style="color:#6bbf7b">${c.wins}</div><div class="l">Vinte</div></div>
+        <div class="stat"><div class="n" style="color:#e08f8f">${c.losses}</div><div class="l">Perse</div></div>
+      </div>
+      <div class="form"><span class="lab">Forma</span>
+        <div class="dots">${c.form.map(f=>`<span style="background:${f.color}"></span>`).join("")}</div>
+        <span style="flex:1"></span><span class="partner">con ${esc(c.partner)}</span>
+      </div>
+    </div>`;
+}
+
 /* ---- render dashboard ---- */
 let teamPage=0;   // pagina corrente della classifica team (toggle in basso)
 
@@ -926,25 +1119,7 @@ function render(){
   const pairRankHtml=_tr.rows, teamPagerHtml=_tr.pager;
 
   const leaderName = d.playerRank.length ? d.playerRank[0].name : null;
-  const cardsHtml=d.cards.map(c=>`
-    <div class="pcard">
-      <div class="tint" style="background:${c.tint}"></div>
-      <div class="row1">
-        <div class="badge${c.name===leaderName?" leader":""}" style="background:${c.color}">${c.name===leaderName?'<span class="crown" aria-label="Primo in classifica">👑</span>':''}${esc(c.initial)}</div>
-        <div><div class="nm">${esc(c.name)}</div><div class="pl">${c.played} partite giocate</div></div>
-        <span style="flex:1"></span>
-        <div class="role" title="${esc(c.roleDetail)}" style="background:${c.roleBg};color:${c.roleColor}"><span class="role-ic">${c.roleIcon}</span> ${c.role}</div>
-      </div>
-      <div class="stats">
-        <div class="stat"><div class="n" style="color:${c.color}">${c.winPct}%</div><div class="l">Win</div></div>
-        <div class="stat"><div class="n" style="color:#6bbf7b">${c.wins}</div><div class="l">Vinte</div></div>
-        <div class="stat"><div class="n" style="color:#e08f8f">${c.losses}</div><div class="l">Perse</div></div>
-      </div>
-      <div class="form"><span class="lab">Forma</span>
-        <div class="dots">${c.form.map(f=>`<span style="background:${f.color}"></span>`).join("")}</div>
-        <span style="flex:1"></span><span class="partner">con ${esc(c.partner)}</span>
-      </div>
-    </div>`).join("");
+  const cardsHtml=d.cards.map(c=>playerCardHtml(c,leaderName)).join("");
 
   const recentHtml=d.recent.map(m=>`
     <div class="mrec"><div class="t l" style="color:${m.blueColor}">${esc(m.blue)}</div>
@@ -1155,7 +1330,9 @@ function endIntro(){
   clearTimeout(introTimer);
   const intro=document.getElementById("intro");
   intro.classList.remove("run"); intro.style.display="none";
-  document.getElementById("app").style.display="block";
+  // primo avvio → scelta modalità; dopo (es. "Rivedi intro") → torna all'app
+  if(typeof modeChosen!=="undefined" && modeChosen) document.getElementById("app").style.display="block";
+  else showModeSelect();
 }
 document.getElementById("skipBtn").addEventListener("click",endIntro);
 document.getElementById("replayBtn").addEventListener("click",()=>{
@@ -1462,6 +1639,332 @@ byId("extUse").addEventListener("click",()=>{
 });
 
 /* =====================================================================
+   NAVIGAZIONE · MODALITÀ · TAB
+   ===================================================================== */
+let modeChosen=false, activeTab="dash", appMode="current";
+function showModeSelect(){
+  document.getElementById("app").style.display="none";
+  document.getElementById("modeSelect").classList.add("open");
+}
+/* mostra solo tab e pulsanti pertinenti alla modalità scelta */
+function applyModeUI(){
+  const champ = appMode==="champ";
+  const tabOf=t=>document.querySelector('.tab[data-tab="'+t+'"]');
+  if(tabOf("dash")) tabOf("dash").hidden = champ;         // Dashboard solo in modalità attuale
+  if(tabOf("champ"))tabOf("champ").hidden = !champ;       // Campionato solo in modalità campionato
+  if(tabOf("albo")) tabOf("albo").hidden = !champ;        // Albo d'oro solo in modalità campionato
+  byId("addBtnTop").hidden  = champ;                      // Nuova partita: solo modalità attuale
+  byId("extractBtn").hidden = champ;                      // Estrattore: solo modalità attuale
+}
+function chooseMode(mode){
+  modeChosen=true;
+  appMode = mode==="champ" ? "champ" : "current";
+  document.getElementById("modeSelect").classList.remove("open");
+  document.getElementById("app").style.display="block";
+  applyModeUI();
+  switchTab(champTab());
+}
+function champTab(){return appMode==="champ" ? "champ" : "dash";}
+function switchTab(tab){
+  activeTab=tab;
+  ["dash","champ","albo"].forEach(t=>{
+    const v=document.getElementById(t); if(v)v.hidden=(t!==tab);
+    const b=document.querySelector('.tab[data-tab="'+t+'"]'); if(b)b.classList.toggle("active",t===tab);
+  });
+  if(tab==="champ")renderChamp();
+  if(tab==="albo")renderAlbo();
+  try{window.scrollTo(0,0);}catch(e){}
+}
+byId("modeCurrent").addEventListener("click",()=>chooseMode("current"));
+byId("modeChamp").addEventListener("click",()=>chooseMode("champ"));
+byId("modeSwapHdr").addEventListener("click",showModeSelect);
+document.querySelectorAll('.tab[data-tab]').forEach(b=>b.addEventListener("click",()=>switchTab(b.getAttribute("data-tab"))));
+
+/* =====================================================================
+   CAMPIONATO  (ruoli Dif/Att contano · colore ignorato · C(n,4)×12 combinazioni)
+   ===================================================================== */
+let CHAMP=null, CHAMP_MATCHES=[], champNext=null, champSetupSel=null, champPresent=null;
+
+function champTotalCombos(n){
+  if(n<4)return 0;
+  const C=(a,b)=>{let r=1;for(let i=0;i<b;i++)r=r*(a-i)/(i+1);return Math.round(r);};
+  return C(n,4)*12;   // 3 accoppiamenti × 4 assegnazioni di ruolo
+}
+/* chiave univoca di una combinazione: ruoli contano (difesa›attacco), colore ignorato */
+function champKey(t1,t2){const k=p=>p[0]+"›"+p[1];return [k(t1),k(t2)].sort().join("|");}
+function champEnumerate(roster){
+  const out=[],seen=new Set(),n=roster.length;
+  for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)for(let k=j+1;k<n;k++)for(let l=k+1;l<n;l++){
+    const f=[roster[i],roster[j],roster[k],roster[l]];
+    [[[0,1],[2,3]],[[0,2],[1,3]],[[0,3],[1,2]]].forEach(pt=>{
+      const P=[f[pt[0][0]],f[pt[0][1]]],Q=[f[pt[1][0]],f[pt[1][1]]];
+      [[P[0],P[1]],[P[1],P[0]]].forEach(pp=>[[Q[0],Q[1]],[Q[1],Q[0]]].forEach(qq=>{
+        const key=champKey(pp,qq); if(!seen.has(key)){seen.add(key);out.push({t1:pp,t2:qq});}
+      }));
+    });
+  }
+  return out;
+}
+function champPlayedKeys(){return new Set(CHAMP_MATCHES.map(m=>champKey(m.blue,m.red)));}
+function pickChampNext(){
+  if(!CHAMP||!CHAMP.roster)return null;
+  // sorteggia solo tra i presenti oggi (default = tutto il roster)
+  const present = champPresent ? [...champPresent] : CHAMP.roster;
+  if(present.length<4)return null;
+  const all=champEnumerate(present), played=champPlayedKeys();
+  const remaining=all.filter(m=>!played.has(champKey(m.t1,m.t2)));
+  const pool=remaining.length?remaining:all;   // se i presenti hanno finito le loro combo, si ripescano
+  return pool.length?pool[Math.floor(Math.random()*pool.length)]:null;
+}
+function nextTeamsHtml(){
+  const n=champNext;
+  return '<div class="nt-team t1">'+champSlot(n&&n.t1[0],"Difesa")+champSlot(n&&n.t1[1],"Attacco")+'</div>'+
+         '<div class="nt-vs">VS</div>'+
+         '<div class="nt-team t2">'+champSlot(n&&n.t2[0],"Difesa")+champSlot(n&&n.t2[1],"Attacco")+'</div>';
+}
+/* aggiorna solo gli slot della prossima partita, senza perdere i punteggi digitati */
+function refreshNextSlots(){
+  champNext=pickChampNext();
+  const teams=document.querySelector("#champ .next-teams"); if(teams)teams.innerHTML=nextTeamsHtml();
+  const msg=byId("champMsg"); const presN=champPresent?champPresent.size:(CHAMP?CHAMP.roster.length:0);
+  if(msg)msg.textContent = presN<4 ? "Seleziona almeno 4 presenti per sorteggiare." : "";
+}
+
+function champSlot(name,role){
+  if(!name)return '<div class="nt-slot"><span class="avatar" style="background:#d8d2c4">?</span><div><div class="rl">'+role+'</div><b style="color:#c3bdca">—</b></div></div>';
+  return '<div class="nt-slot"><span class="avatar" style="background:'+colorFor(name)+'">'+esc(name[0])+'</span><div><div class="rl">'+role+'</div><b>'+esc(name)+'</b></div></div>';
+}
+function stepperHtml(id,val){
+  return '<div class="stepper"><button type="button" data-cstep="'+id+':-1">−</button><input id="champ'+id.toUpperCase()+'" type="number" min="0" max="30" value="'+val+'" inputmode="numeric"><button type="button" data-cstep="'+id+':1">＋</button></div>';
+}
+
+/* rendimento per ruolo: partite/vittorie giocando in difesa (pos.1) vs attacco (pos.2) */
+function champRolePerf(matches){
+  const P={}, ens=n=>P[n]||(P[n]={name:n,defG:0,defW:0,attG:0,attW:0});
+  matches.forEach(m=>{
+    const bWon=m.bs>m.rs;
+    if(m.blue&&m.blue.length===2){const d=ens(m.blue[0]),a=ens(m.blue[1]);d.defG++;a.attG++;if(bWon){d.defW++;a.attW++;}}
+    if(m.red &&m.red.length===2){const d=ens(m.red[0]), a=ens(m.red[1]); d.defG++;a.attG++;if(!bWon){d.defW++;a.attW++;}}
+  });
+  return Object.values(P);
+}
+
+/* sezioni statistiche del campionato (calcolate solo sulle partite del campionato, d = compute(CHAMP_MATCHES)) */
+function renderChampStats(d){
+  const leader=d.playerRank.length?d.playerRank[0].name:null;
+  const pctG=(w,g)=>g?Math.round(w/g*100):0;
+  const rp=champRolePerf(CHAMP_MATCHES).filter(p=>p.defG+p.attG>0).sort((a,b)=>(b.defG+b.attG)-(a.defG+a.attG));
+  const rpHtml=rp.length?rp.map(p=>{
+    const dp=pctG(p.defW,p.defG),ap=pctG(p.attW,p.attG);
+    return '<div class="rp-row"><span class="who"><span class="avatar" style="background:'+colorFor(p.name)+'">'+esc(p.name[0])+'</span><b>'+esc(p.name)+'</b></span>'+
+      '<div class="rp-cell" style="color:'+(p.defG?pctColor(dp):"#c9c3d0")+'">'+(p.defG?dp+"%":"—")+'<div class="rp-sub">'+p.defW+"/"+p.defG+'</div></div>'+
+      '<div class="rp-cell" style="color:'+(p.attG?pctColor(ap):"#c9c3d0")+'">'+(p.attG?ap+"%":"—")+'<div class="rp-sub">'+p.attW+"/"+p.attG+'</div></div></div>';
+  }).join(""):'<div class="empty">Il rendimento per ruolo compare quando si gioca.</div>';
+
+  const prHtml=d.playerRank.length?d.playerRank.map(p=>
+    '<div class="rank-row"><span class="pos" style="color:'+p.rankColor+'">'+p.rank+'</span>'+
+    '<span class="who"><span class="avatar" style="background:'+p.color+'">'+esc(p.initial)+'</span><b>'+esc(p.name)+'</b>'+medalTag(p.rank)+'</span>'+
+    '<span class="w">'+p.wins+'</span><span class="p">'+p.played+'</span><span class="pct" style="color:'+pctColor(p.winPct)+'">'+p.winPct+'%</span></div>').join(""):'<div class="empty">Nessuna partita ancora.</div>';
+
+  const pairHtml=d.pairRank.length?d.pairRank.map(c=>
+    '<div class="pair-row"><span class="pos">'+c.rank+'</span><span class="pteam"><b>'+esc(c.names)+'</b>'+medalTag(c.rank)+'</span>'+
+    '<span class="wp">'+c.wins+'/'+c.played+'</span><span class="pct" style="color:'+pctColor(c.winPct)+'">'+c.winPct+'%</span></div>').join(""):'<div class="empty">Nessuna coppia con almeno 3 partite.</div>';
+
+  const scHtml=d.scorers.length?d.scorers.map(s=>'<div class="barrow"><div class="top"><b>'+esc(s.names)+'</b><b>'+s.gf+'</b></div><div class="track"><i style="width:'+s.pct+';background:'+s.color+'"></i></div></div>').join(""):'<div class="empty">Servono almeno 3 partite per coppia.</div>';
+  const coHtml=d.conceders.length?d.conceders.map(s=>'<div class="barrow"><div class="top"><b>'+esc(s.names)+'</b><b>'+s.ga+'</b></div><div class="track"><i style="width:'+s.pct+';background:'+s.color+'"></i></div></div>').join(""):'<div class="empty">Servono almeno 3 partite per coppia.</div>';
+
+  const cardsHtml=d.cards.length?d.cards.map(c=>playerCardHtml(c,leader)).join(""):'<div class="empty">Le schede compaiono quando i giocatori raggiungono 5 partite.</div>';
+  const recHtml=d.recent.length?d.recent.map(m=>'<div class="mrec"><div class="t l" style="color:'+m.blueColor+'">'+esc(m.blue)+'</div><div class="score"><span class="b">'+m.bs+'</span><span class="sep">:</span><span class="r">'+m.rs+'</span></div><div class="t r" style="color:'+m.redColor+'">'+esc(m.red)+'</div></div>').join(""):'<div class="empty">Nessuna partita ancora.</div>';
+
+  return ''+
+  '<section class="panel"><div class="sect-head"><h2 class="h2">🛡️⚡ Rendimento per ruolo</h2><span class="sect-note">win% giocando in difesa vs attacco</span></div>'+
+    '<div class="rp-head"><span>Giocatore</span><span>🛡️ Difesa</span><span>⚡ Attacco</span></div>'+rpHtml+'</section>'+
+  '<section class="two even"><div class="panel"><h2 class="h2" style="margin-bottom:18px">🏆 Classifica giocatori</h2>'+
+    '<div class="rank-head"><span>#</span><span>Giocatore</span><span class="cc col-win">Vinte</span><span class="cc col-played">Giocate</span><span class="rr">Win%</span></div>'+prHtml+'</div>'+
+    '<div class="panel"><h2 class="h2">👥 Classifica team</h2><p class="sect-note" style="margin:8px 0 16px">Minimo 3 partite insieme</p>'+
+    '<div class="pair-head"><span>#</span><span>Team</span><span class="cc">V/G</span><span class="rr">Win%</span></div>'+pairHtml+'</div></section>'+
+  '<section class="panel"><div class="sect-head"><h2 class="h2">⚽ Gol fatti</h2><span class="sect-note">per coppia · minimo 3 partite</span></div><div class="barlist grid2">'+scHtml+'</div></section>'+
+  '<section class="panel"><div class="sect-head"><h2 class="h2">🧤 Gol subiti</h2><span class="sect-note">meno subiti = miglior difesa</span></div><div class="barlist grid2">'+coHtml+'</div></section>'+
+  '<section><h2 class="h2" style="font-size:26px;margin-bottom:18px">Schede giocatori</h2><div class="cards">'+cardsHtml+'</div></section>'+
+  '<section class="panel"><h2 class="h2" style="margin-bottom:18px">Ultime partite del campionato</h2><div class="match2">'+recHtml+'</div></section>';
+}
+
+/* scheda espandibile con tutte le combinazioni, valorizzate man mano che si giocano */
+function champCombosHtml(){
+  if(!CHAMP||!CHAMP.roster||CHAMP.roster.length<4)return "";
+  const all=champEnumerate(CHAMP.roster), byKey={};
+  CHAMP_MATCHES.forEach(m=>{byKey[champKey(m.blue,m.red)]=m;});
+  const total=all.length, played=Object.keys(byKey).length;
+  const rows=all.map((m,i)=>{
+    const rec=byKey[champKey(m.t1,m.t2)];
+    const label='<span class="rr">D</span>'+esc(m.t1[0])+' · <span class="rr">A</span>'+esc(m.t1[1])+'  vs  <span class="rr">D</span>'+esc(m.t2[0])+' · <span class="rr">A</span>'+esc(m.t2[1]);
+    let res;
+    if(rec){const t1blue=(m.t1[0]===rec.blue[0]&&m.t1[1]===rec.blue[1]);const a=t1blue?rec.bs:rec.rs,b=t1blue?rec.rs:rec.bs;res='<span class="res">'+a+'–'+b+'</span>';}
+    else res='<span class="res todo">da giocare</span>';
+    return '<div class="combo'+(rec?' played':'')+'"><span class="cn">'+(i+1)+'</span><span class="teams">'+label+'</span>'+res+'</div>';
+  }).join("");
+  return '<details class="combos"><summary><span class="h2">📋 Tutte le combinazioni</span><span class="cs-note">'+played+' / '+total+' giocate</span><span class="chev">▾</span></summary><div class="combos-body">'+rows+'</div></details>';
+}
+
+function renderChamp(){
+  const el=document.getElementById("champ"); if(!el)return;
+  if(!CHAMP || !CHAMP.active){
+    if(!champSetupSel)champSetupSel=new Set(currentRoster().slice(0,6));
+    const roster=currentRoster();
+    el.innerHTML=
+      '<section class="panel champ-setup">'+
+      '<h2 class="h2">🏆 Nuovo campionato</h2>'+
+      '<p class="lead">Scegli i giocatori fissi (min 4, ideale 6). Formato: <b>tutte le combinazioni attacco/difesa</b>, colore squadra indipendente.</p>'+
+      '<input id="champName" type="text" maxlength="40" placeholder="Nome del campionato (es. Settembre 2026)">'+
+      '<div class="roster-pick">'+ (roster.length?roster.map(n=>'<button class="ext-chip rchip '+(champSetupSel.has(n)?"on":"")+'" data-p="'+esc(n)+'"><span class="dot" style="background:'+colorFor(n)+'"></span>'+esc(n)+'</button>').join("") : '<div class="empty">Nessun giocatore in anagrafica.</div>') +'</div>'+
+      '<p class="sect-note" id="champSetupInfo" style="margin:10px 0 16px">Selezionati: '+champSetupSel.size+' → <b>'+champTotalCombos(champSetupSel.size)+'</b> partite totali</p>'+
+      '<div class="form-msg" id="champMsg"></div>'+
+      '<button class="btn primary js-createchamp" style="padding:14px 24px">Avvia campionato ›</button>'+
+      '</section>';
+    return;
+  }
+  // campionato attivo
+  if(!champPresent)champPresent=new Set(CHAMP.roster);
+  if(!champNext)champNext=pickChampNext();
+  const total=champTotalCombos(CHAMP.roster.length);
+  const played=champPlayedKeys().size, prog=total?Math.round(played/total*100):0;
+  const d=compute(CHAMP_MATCHES);
+  const done=played>=total && total>0;
+  const gol=CHAMP_MATCHES.reduce((s,m)=>s+(m.bs||0)+(m.rs||0),0);
+  const created=CHAMP.createdAt?new Date(CHAMP.createdAt).toLocaleDateString("it-IT",{day:"2-digit",month:"long",year:"numeric"}):"";
+  const kpi=(v,l,c)=>'<div class="kpi"><div class="v" style="color:'+c+'">'+v+'</div><div class="l">'+l+'</div></div>';
+
+  const nextHtml = done ?
+    '<div class="champ-empty"><div class="big">🎉</div><b>Campionato completato!</b><div>Tutte le '+total+' combinazioni giocate. Chiudi per incoronare il campione.</div></div>'
+    :
+    '<div class="next-stage"><div class="next-teams">'+nextTeamsHtml()+'</div>'+
+    '<div class="score-entry">'+stepperHtml("bs",10)+'<span class="nt-vs">–</span>'+stepperHtml("rs",6)+'</div>'+
+    '<div class="form-msg" id="champMsg"></div>'+
+    '<div class="champ-actions" style="justify-content:center">'+
+      '<button class="btn js-sorteggia">🎲 Sorteggia un\'altra</button>'+
+      '<button class="btn save js-savechamp">✔ Salva risultato</button>'+
+    '</div></div>';
+
+  el.innerHTML=
+    '<section class="hero" style="margin-bottom:22px">'+
+      '<div class="hero-copy"><span class="eyebrow">Campionato · '+esc(CHAMP.name||"")+'</span>'+
+        '<h1>Tutti i ruoli.<br>Un solo campione.</h1>'+
+        '<p>Ogni combinazione attacco/difesa, colore indipendente. '+total+' partite per decretare il migliore.</p>'+
+        '<div class="kpis">'+kpi(CHAMP_MATCHES.length,"Partite","#3b3c46")+kpi(played+"/"+total,"Combinazioni","#e08f5a")+kpi(CHAMP.roster.length,"Giocatori","#6bbf7b")+kpi(gol,"Gol totali","#b48ce0")+'</div>'+
+      '</div>'+
+      '<div class="field"><div class="midline"></div><div class="circle"></div><div class="goal-l"></div><div class="goal-r"></div><div class="rods">'+rodsHtml(d.rods,34)+'</div><div class="ball"></div></div>'+
+    '</section>'+
+    '<section class="champ-hero" style="margin-bottom:24px"><span class="deco">🏆</span>'+
+      '<div class="meta">Avviato il '+created+' · '+CHAMP.roster.length+' giocatori</div>'+
+      '<div class="fmt-badges"><span class="fmt-badge">🛡️⚡ Ruoli Dif/Att contano</span><span class="fmt-badge">🎨 Colore ignorato</span><span class="fmt-badge">🎯 '+total+' partite</span></div>'+
+      '<div class="progress-wrap"><div class="progress-top"><span>Avanzamento</span><span>'+played+' / '+total+' combinazioni</span></div>'+
+      '<div class="progress-track"><i style="width:'+prog+'%"></i></div></div>'+
+      (done?'<div class="champ-actions"><button class="btn js-closechamp" style="background:linear-gradient(135deg,#f2b721,#e6a41a);color:#4a3a00;border:none;padding:14px 24px">🏆 Chiudi e incorona il campione</button></div>':'')+
+    '</section>'+
+    '<section class="panel" style="padding:20px 22px"><div class="sect-head"><h2 class="h2">📍 Presenti oggi</h2><span class="sect-note" id="champPresentNote">'+champPresent.size+' presenti · il sorteggio usa solo loro</span></div>'+
+      '<div class="ext-chips">'+CHAMP.roster.map(n=>'<button class="ext-chip cpres '+(champPresent.has(n)?"on":"")+'" data-cp="'+esc(n)+'"><span class="dot" style="background:'+colorFor(n)+'"></span>'+esc(n)+'</button>').join("")+'</div></section>'+
+    '<section class="next-card"><div class="sect-head"><h2 class="h2">Prossima partita</h2><span class="sect-note">tra i presenti · combinazione non ancora giocata</span></div>'+nextHtml+'</section>'+
+    renderChampStats(d)+
+    champCombosHtml();
+}
+
+function createChampionship(){
+  const name=(byId("champName").value||"").trim()||"Campionato";
+  const roster=[...(champSetupSel||[])];
+  const m=byId("champMsg");
+  if(roster.length<4){if(m)m.textContent="Seleziona almeno 4 giocatori.";return;}
+  const obj={name:name,createdAt:Date.now(),active:true,roster:roster};
+  champNext=null; champPresent=null;
+  if(window.dbChampSet){window.dbChampSet(obj);}
+  else{CHAMP=obj;CHAMP_MATCHES=[];renderChamp();}
+  champSetupSel=null;
+  toast("🏆 Campionato avviato!");
+}
+function saveChampResult(){
+  if(!champNext)return;
+  const bs=parseInt((byId("champBS")||{}).value||"0",10), rs=parseInt((byId("champRS")||{}).value||"0",10);
+  const m=byId("champMsg");
+  if(bs===rs){if(m)m.textContent="Il risultato non può finire in parità.";return;}
+  const rec={blue:champNext.t1,bs:bs,red:champNext.t2,rs:rs};
+  champNext=null;
+  if(window.dbChampAddMatch){window.dbChampAddMatch(rec);}
+  else{CHAMP_MATCHES.push(rec);renderChamp();}
+  const win=bs>rs?rec.blue.join(" & "):rec.red.join(" & ");
+  toast("⚽ Registrata · vincono "+win);
+}
+function closeChampionship(){
+  if(!CHAMP)return;
+  if(!CHAMP_MATCHES.length){toast("Nessuna partita giocata: gioca prima qualche match.");return;}
+  const cd=compute(CHAMP_MATCHES), leader=cd.playerRank[0];
+  if(!leader)return;
+  if(!confirm('Chiudere "'+(CHAMP.name||"")+'" e incoronare campione '+leader.name+' ('+leader.winPct+'% · '+leader.wins+'/'+leader.played+')?'))return;
+  const trophy={champion:leader.name,championColor:colorFor(leader.name),name:CHAMP.name||"Campionato",
+    date:Date.now(),roster:CHAMP.roster,wins:leader.wins,played:leader.played,winPct:leader.winPct};
+  champNext=null;
+  if(window.dbTrophyAdd&&window.dbChampClear){window.dbTrophyAdd(trophy);window.dbChampClear();}
+  else{TROPHIES.unshift({...trophy,_key:"local"+Date.now()});CHAMP=null;CHAMP_MATCHES=[];updateAlboCount();}
+  toast("🏆 "+leader.name+" è campione!");
+  switchTab("albo");
+}
+
+/* deleghe eventi Campionato */
+byId("champ").addEventListener("click",e=>{
+  const t=e.target;
+  if(t.closest(".js-createchamp"))return createChampionship();
+  if(t.closest(".js-sorteggia")){refreshNextSlots();return;}
+  if(t.closest(".js-savechamp"))return saveChampResult();
+  if(t.closest(".js-closechamp"))return closeChampionship();
+  const st=t.closest("[data-cstep]");
+  if(st){const parts=st.getAttribute("data-cstep").split(":");const inp=byId("champ"+parts[0].toUpperCase());if(inp){let v=parseInt(inp.value||"0",10)+parseInt(parts[1],10);inp.value=Math.max(0,Math.min(30,v));}return;}
+  const rc=t.closest(".rchip[data-p]");
+  if(rc){const n=rc.getAttribute("data-p");if(champSetupSel.has(n)){champSetupSel.delete(n);rc.classList.remove("on");}else{champSetupSel.add(n);rc.classList.add("on");}
+    const info=byId("champSetupInfo");if(info)info.innerHTML="Selezionati: "+champSetupSel.size+" → <b>"+champTotalCombos(champSetupSel.size)+"</b> partite totali";return;}
+  const cp=t.closest(".cpres[data-cp]");
+  if(cp){const n=cp.getAttribute("data-cp");if(champPresent.has(n)){champPresent.delete(n);cp.classList.remove("on");}else{champPresent.add(n);cp.classList.add("on");}
+    const note=byId("champPresentNote");if(note)note.textContent=champPresent.size+" presenti · il sorteggio usa solo loro";
+    refreshNextSlots();return;}
+});
+
+/* =====================================================================
+   ALBO D'ORO / BACHECA TROFEI
+   ===================================================================== */
+let TROPHIES=[];
+function updateAlboCount(){const el=byId("alboCount");if(!el)return;el.textContent=TROPHIES.length;el.hidden=TROPHIES.length===0;}
+function trophyCard(t,i){
+  const d=t.date?new Date(t.date):null;
+  const dstr=d?d.toLocaleDateString("it-IT",{day:"2-digit",month:"short",year:"numeric"}):"";
+  const col=t.championColor||colorFor(t.champion||"?");
+  return '<div class="trophy" style="animation-delay:'+(i*.06)+'s"><span class="crown-badge">👑</span>'+
+    '<div class="cup">🏆</div>'+
+    '<div class="champ-av" style="background:'+col+'">'+esc((t.champion||"?")[0])+'</div>'+
+    '<div class="champ-name">'+esc(t.champion||"—")+'</div><div class="champ-role">Campione</div>'+
+    '<div class="t-name">'+esc(t.name||"Campionato")+'</div><div class="t-date">'+dstr+'</div>'+
+    '<div class="t-stats"><div><b>'+(t.winPct!=null?t.winPct+"%":"—")+'</b>win</div><div><b>'+(t.wins!=null?t.wins:"—")+'</b>vinte</div><div><b>'+(t.played!=null?t.played:"—")+'</b>gioc.</div></div></div>';
+}
+function renderAlbo(){
+  const el=document.getElementById("albo"); if(!el)return;
+  const list=TROPHIES.slice().sort((a,b)=>(b.date||0)-(a.date||0));
+  el.innerHTML='<div class="albo-hero"><h2>🏅 Albo d\'oro</h2><p>La bacheca dei trofei · '+list.length+' '+(list.length===1?"campione":"campioni")+'</p></div>'+
+    (list.length?'<div class="trophies">'+list.map((t,i)=>trophyCard(t,i)).join("")+'</div>'
+      :'<div class="albo-empty"><div class="big">🏆</div><b>Nessun trofeo… ancora.</b><div>Avvia un campionato e incorona il primo campione!</div></div>');
+}
+
+/* hook chiamati dal modulo Firebase (nodi championship / trophies) */
+window.applyChampionship=function(champObj){
+  if(!champObj){CHAMP=null;CHAMP_MATCHES=[];}
+  else{
+    CHAMP={name:champObj.name,createdAt:champObj.createdAt,active:champObj.active!==false,roster:champObj.roster||[]};
+    CHAMP_MATCHES=champObj.matches?Object.entries(champObj.matches).map(([k,v])=>({...v,_key:k})):[];
+  }
+  if(activeTab==="champ")renderChamp();
+};
+window.applyTrophies=function(tObj){
+  TROPHIES=tObj?Object.entries(tObj).map(([k,v])=>({...v,_key:k})):[];
+  updateAlboCount();
+  if(activeTab==="albo")renderAlbo();
+};
+
+/* =====================================================================
    BOOT
    ===================================================================== */
 render();
@@ -1502,6 +2005,11 @@ try{
   window.dbRemove = (key) => remove(ref(db, "matches/" + key));
   window.dbSetPlayer    = (name, obj) => set(ref(db, "players/" + name), obj);
   window.dbRemovePlayer = (name) => remove(ref(db, "players/" + name));
+  // Campionato + Albo d'oro
+  window.dbChampSet      = (obj) => set(ref(db, "championship"), obj);
+  window.dbChampAddMatch = (rec) => push(ref(db, "championship/matches"), rec);
+  window.dbChampClear    = () => remove(ref(db, "championship"));
+  window.dbTrophyAdd     = (obj) => push(ref(db, "trophies"), obj);
 
   let seeded = false, subscribed = false;
   // Ascolta l'intero database: legge insieme `players` (anagrafica) e `matches` (partite)
@@ -1512,6 +2020,10 @@ try{
 
       // 1) Anagrafica giocatori → arricchisce colori/stili prima del render
       if (val.players) window.applyRemotePlayers(val.players);
+
+      // 1b) Campionato + Albo d'oro (sempre, anche se matches è vuoto)
+      if (window.applyChampionship) window.applyChampionship(val.championship || null);
+      if (window.applyTrophies) window.applyTrophies(val.trophies || null);
 
       // 2) Partite
       if (val.matches == null) {
