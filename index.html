@@ -521,6 +521,20 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
 .rp-row .who b{color:var(--ink2);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rp-cell{text-align:center;font-family:var(--display);font-weight:700;font-size:16px;line-height:1.1}
 .rp-cell .rp-sub{font-family:var(--font);font-size:11px;font-weight:700;color:var(--muted2);margin-top:2px}
+/* classifiche campionato (con colonna gol fatti:subiti) */
+.cst-head,.cst-row{display:grid;grid-template-columns:26px 1fr 66px 52px 52px;gap:8px;align-items:center}
+.cst-head{padding:0 10px 10px;font-size:11px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.3px}
+.cst-head .c{text-align:center}.cst-head .r{text-align:right}
+.cst-row{padding:9px 10px;border-radius:14px;transition:.15s}
+.cst-row:hover{background:#f3ede1}
+.cst-row .pos{font-family:var(--display);font-weight:700;font-size:16px}
+.cst-row .who{display:flex;align-items:center;gap:9px;min-width:0}
+.cst-row .who b{color:var(--ink2);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cst-row .gd{text-align:center;font-size:13px;font-weight:700;color:var(--muted)}
+.cst-row .gd b{color:var(--green)}.cst-row .gd i{color:#cf7a7a;font-style:normal}
+.cst-row .vg{text-align:center;font-size:13px;font-weight:700;color:var(--muted)}
+.cst-row .pts{text-align:right;font-family:var(--display);font-weight:700;font-size:16px;color:#8a5a12}
+@media (max-width:680px){.cst-head,.cst-row{grid-template-columns:22px 1fr 60px 46px 46px;gap:6px}}
 /* combinazioni espandibili */
 .combos{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
 .combos>summary{list-style:none;cursor:pointer;padding:22px 26px;display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -1815,14 +1829,15 @@ function renderChampStats(matches){
   }).join(""):'<div class="empty">Il rendimento per ruolo compare quando si gioca.</div>';
 
   const rankColorsC=["#e6b23f","#b7b1bd","#cf9b6a"];
+  const gd=(gf,ga)=>'<span class="gd"><b>'+gf+'</b>:<i>'+ga+'</i></span>';
   const prRows=stC.length?stC.map((p,i)=>
-    '<div class="rank-row"><span class="pos" style="color:'+(rankColorsC[i]||"#c3bdca")+'">'+p.rank+'</span>'+
+    '<div class="cst-row"><span class="pos" style="color:'+(rankColorsC[i]||"#c3bdca")+'">'+p.rank+'</span>'+
     '<span class="who"><span class="avatar" style="background:'+colorFor(p.name)+'">'+esc(p.name[0])+'</span><b>'+esc(p.name)+'</b>'+medalTag(p.rank)+'</span>'+
-    '<span class="w">'+p.wins+'</span><span class="p">'+p.played+'</span><span class="pct" style="color:#8a5a12">'+p.pts+'</span></div>').join(""):'<div class="empty">Nessuna partita ancora.</div>';
+    gd(p.gf,p.ga)+'<span class="vg">'+p.wins+'/'+p.played+'</span><span class="pts">'+p.pts+'</span></div>').join(""):'<div class="empty">Nessuna partita ancora.</div>';
 
   const teamRows=teamSt.length?teamSt.map(t=>
-    '<div class="pair-row"><span class="pos" style="color:'+(rankColorsC[t.rank-1]||"#c3bdca")+'">'+t.rank+'</span><span class="pteam"><b>'+esc(t.names)+'</b>'+medalTag(t.rank)+'</span>'+
-    '<span class="wp">'+t.wins+'/'+t.played+'</span><span class="pct" style="color:#8a5a12">'+t.pts+'</span></div>').join(""):'<div class="empty">Nessuna coppia ancora.</div>';
+    '<div class="cst-row"><span class="pos" style="color:'+(rankColorsC[t.rank-1]||"#c3bdca")+'">'+t.rank+'</span><span class="who"><b>'+esc(t.names)+'</b>'+medalTag(t.rank)+'</span>'+
+    gd(t.gf,t.ga)+'<span class="vg">'+t.wins+'/'+t.played+'</span><span class="pts">'+t.pts+'</span></div>').join(""):'<div class="empty">Nessuna coppia ancora.</div>';
   const indivPod=stC.slice(0,3).map(p=>({name:p.name,pts:p.pts,color:colorFor(p.name)}));
   const teamPod=teamSt.slice(0,3).map(t=>({names:t.names,members:t.members,pts:t.pts}));
   const podiosHtml=ms.length?(
@@ -1838,10 +1853,10 @@ function renderChampStats(matches){
 
   return ''+
   podiosHtml+
-  '<section class="two even"><div class="panel"><h2 class="h2">👥 Classifica team (punti)</h2><p class="sect-note" style="margin:8px 0 16px">coppie · attacco+difesa insieme</p>'+
-    '<div class="pair-head"><span>#</span><span>Team</span><span class="cc">V/G</span><span class="rr">Punti</span></div>'+teamRows+'</div>'+
-    '<div class="panel"><h2 class="h2">🏆 Classifica individuale (punti)</h2><p class="sect-note" style="margin:8px 0 16px">3 secca · 2 ai vantaggi · 1 sconfitta ai vantaggi</p>'+
-    '<div class="rank-head"><span>#</span><span>Giocatore</span><span class="cc col-win">Vinte</span><span class="cc col-played">Giocate</span><span class="rr">Punti</span></div>'+prRows+'</div></section>'+
+  '<section class="two even"><div class="panel"><h2 class="h2">👥 Classifica team (punti)</h2><p class="sect-note" style="margin:8px 0 16px">coppie · attacco+difesa insieme · GF:GS = gol fatti:subiti</p>'+
+    '<div class="cst-head"><span>#</span><span>Team</span><span class="c">GF:GS</span><span class="c">V/G</span><span class="r">Punti</span></div>'+teamRows+'</div>'+
+    '<div class="panel"><h2 class="h2">🏆 Classifica individuale (punti)</h2><p class="sect-note" style="margin:8px 0 16px">3 secca · 2 ai vantaggi · 1 sconfitta ai vantaggi · GF:GS = gol fatti:subiti</p>'+
+    '<div class="cst-head"><span>#</span><span>Giocatore</span><span class="c">GF:GS</span><span class="c">V/G</span><span class="r">Punti</span></div>'+prRows+'</div></section>'+
   '<section class="panel"><div class="sect-head"><h2 class="h2">🛡️⚡ Rendimento per ruolo</h2><span class="sect-note">win% giocando in difesa vs attacco</span></div>'+
     '<div class="rp-head"><span>Giocatore</span><span>🛡️ Difesa</span><span>⚡ Attacco</span></div>'+rpHtml+'</section>'+
   '<section class="panel"><div class="sect-head"><h2 class="h2">⚽ Gol fatti</h2><span class="sect-note">per coppia · minimo 3 partite</span></div><div class="barlist grid2">'+scHtml+'</div></section>'+
