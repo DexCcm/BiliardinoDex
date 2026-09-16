@@ -1830,14 +1830,16 @@ function renderChampStats(matches){
 
   const rankColorsC=["#e6b23f","#b7b1bd","#cf9b6a"];
   const gd=(gf,ga)=>'<span class="gd"><b>'+gf+'</b>:<i>'+ga+'</i></span>';
+  // stessa scala colori delle % vittorie (pctColor), applicata all'efficienza punti (punti / massimo possibile = 3·partite)
+  const ptsColor=(pts,played)=>pctColor(played?Math.round(pts/(played*3)*100):0);
   const prRows=stC.length?stC.map((p,i)=>
     '<div class="cst-row"><span class="pos" style="color:'+(rankColorsC[i]||"#c3bdca")+'">'+p.rank+'</span>'+
     '<span class="who"><span class="avatar" style="background:'+colorFor(p.name)+'">'+esc(p.name[0])+'</span><b>'+esc(p.name)+'</b>'+medalTag(p.rank)+'</span>'+
-    gd(p.gf,p.ga)+'<span class="vg">'+p.wins+'/'+p.played+'</span><span class="pts">'+p.pts+'</span></div>').join(""):'<div class="empty">Nessuna partita ancora.</div>';
+    gd(p.gf,p.ga)+'<span class="vg">'+p.wins+'/'+p.played+'</span><span class="pts" style="color:'+ptsColor(p.pts,p.played)+'">'+p.pts+'</span></div>').join(""):'<div class="empty">Nessuna partita ancora.</div>';
 
   const teamRows=teamSt.length?teamSt.map(t=>
     '<div class="cst-row"><span class="pos" style="color:'+(rankColorsC[t.rank-1]||"#c3bdca")+'">'+t.rank+'</span><span class="who"><b>'+esc(t.names)+'</b>'+medalTag(t.rank)+'</span>'+
-    gd(t.gf,t.ga)+'<span class="vg">'+t.wins+'/'+t.played+'</span><span class="pts">'+t.pts+'</span></div>').join(""):'<div class="empty">Nessuna coppia ancora.</div>';
+    gd(t.gf,t.ga)+'<span class="vg">'+t.wins+'/'+t.played+'</span><span class="pts" style="color:'+ptsColor(t.pts,t.played)+'">'+t.pts+'</span></div>').join(""):'<div class="empty">Nessuna coppia ancora.</div>';
   const indivPod=stC.slice(0,3).map(p=>({name:p.name,pts:p.pts,color:colorFor(p.name)}));
   const teamPod=teamSt.slice(0,3).map(t=>({names:t.names,members:t.members,pts:t.pts}));
   const podiosHtml=ms.length?(
