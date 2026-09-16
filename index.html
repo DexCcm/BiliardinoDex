@@ -569,6 +569,28 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
 .albo-empty{text-align:center;padding:60px 20px;color:var(--muted)}
 .albo-empty .big{font-size:64px;margin-bottom:12px;opacity:.7}
 .albo-empty b{color:var(--ink2)}
+/* podio */
+.podium-card{background:var(--card);border-radius:24px;padding:24px 22px;box-shadow:var(--shadow);margin-bottom:22px;animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+.podium-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.pc-name{font-family:var(--display);font-weight:700;font-size:20px;color:var(--ink)}
+.pc-date{font-size:13px;font-weight:700;color:var(--muted2)}
+.podium-label{font-size:12px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.6px;margin:16px 0 2px}
+.pstep .p-duo{display:flex;justify-content:center}
+.pstep .p-av2{width:40px;height:40px;border-radius:50%;color:#fff;font-family:var(--display);font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 10px rgba(70,66,80,.2)}
+.pstep .p-av2:not(:first-child){margin-left:-12px}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:14px;padding:14px 0 0}
+.pstep{display:flex;flex-direction:column;align-items:center;gap:6px;width:32%;max-width:150px;position:relative}
+.pstep .p-crown{font-size:24px;line-height:1;animation:crownPulse 1.6s ease-in-out infinite;transform-origin:center}
+.pstep .p-av{width:52px;height:52px;border-radius:50%;color:#fff;font-family:var(--display);font-weight:700;font-size:22px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 6px 14px rgba(70,66,80,.22)}
+.pstep .p-name{font-family:var(--display);font-weight:700;font-size:16px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pstep .p-pts{font-size:12px;font-weight:800;color:var(--muted)}
+.pstep .p-block{width:100%;border-radius:14px 14px 0 0;display:flex;flex-direction:column;align-items:center;gap:2px;color:#fff;padding:10px 0 8px;box-shadow:inset 0 3px 8px rgba(255,255,255,.3)}
+.pstep .p-block .p-medal{font-size:22px;line-height:1}
+.pstep .p-block .p-place{font-family:var(--display);font-weight:700;font-size:15px;opacity:.92}
+.pstep.first .p-block{height:120px;background:linear-gradient(180deg,#f2c94c,#e6a41a)}
+.pstep.second .p-block{height:92px;background:linear-gradient(180deg,#cfd3db,#a9adb8)}
+.pstep.third .p-block{height:70px;background:linear-gradient(180deg,#e5b98c,#cf9b6a)}
+@media (max-width:520px){.pstep .p-av{width:44px;height:44px;font-size:18px}.pstep .p-name{font-size:14px}.podium{gap:8px}}
 
 /* toast */
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:80;
@@ -1749,11 +1771,42 @@ function champRolePerf(matches){
   return Object.values(P);
 }
 
-/* sezioni statistiche del campionato (calcolate solo sulle partite del campionato, d = compute(CHAMP_MATCHES)) */
-function renderChampStats(d){
-  const leader=d.playerRank.length?d.playerRank[0].name:null;
+/* punti campionato: 3 vittoria secca · 2 vittoria ai vantaggi · 1 sconfitta ai vantaggi · 0 sconfitta secca.
+   "ai vantaggi" = si è passati dal 9-9 → il perdente ha almeno 9 gol. */
+function matchPoints(bs,rs){const adv=Math.min(bs,rs)>=9;return{win:adv?2:3,lose:adv?1:0,adv:adv};}
+function champStandings(matches){
+  const P={}, ens=n=>P[n]||(P[n]={name:n,pts:0,played:0,wins:0,losses:0,gf:0,ga:0});
+  matches.forEach(m=>{
+    if(!(m.blue&&m.red&&m.blue.length===2&&m.red.length===2))return;
+    const bWon=m.bs>m.rs, mp=matchPoints(m.bs,m.rs);
+    const wT=bWon?m.blue:m.red, lT=bWon?m.red:m.blue, wG=Math.max(m.bs,m.rs), lG=Math.min(m.bs,m.rs);
+    wT.forEach(n=>{const p=ens(n);p.pts+=mp.win;p.played++;p.wins++;p.gf+=wG;p.ga+=lG;});
+    lT.forEach(n=>{const p=ens(n);p.pts+=mp.lose;p.played++;p.losses++;p.gf+=lG;p.ga+=wG;});
+  });
+  return Object.values(P).sort((a,b)=>b.pts-a.pts||b.wins-a.wins||((b.gf-b.ga)-(a.gf-a.ga))||a.name.localeCompare(b.name)).map((p,i)=>({...p,rank:i+1}));
+}
+/* classifica TEAM a punti: coppia = 2 giocatori insieme (att.+dif. sommati, tutte le partite giocate insieme) */
+function champTeamStandings(matches){
+  const T={}, ens=k=>T[k]||(T[k]={names:k,members:k.split(" & "),pts:0,played:0,wins:0,gf:0,ga:0});
+  (matches||[]).forEach(m=>{
+    if(!(m.blue&&m.red&&m.blue.length===2&&m.red.length===2))return;
+    const bWon=m.bs>m.rs, mp=matchPoints(m.bs,m.rs);
+    const bT=ens([m.blue[0],m.blue[1]].sort().join(" & ")), rT=ens([m.red[0],m.red[1]].sort().join(" & "));
+    bT.played++; rT.played++; bT.gf+=m.bs; bT.ga+=m.rs; rT.gf+=m.rs; rT.ga+=m.bs;
+    if(bWon){bT.pts+=mp.win;bT.wins++;rT.pts+=mp.lose;} else {rT.pts+=mp.win;rT.wins++;bT.pts+=mp.lose;}
+  });
+  return Object.values(T).sort((a,b)=>b.pts-a.pts||b.wins-a.wins||((b.gf-b.ga)-(a.gf-a.ga))||a.names.localeCompare(b.names)).map((t,i)=>({...t,rank:i+1}));
+}
+
+/* sezioni statistiche del campionato — riusabile su qualsiasi lista partite (corrente o storica) */
+function renderChampStats(matches){
+  const ms=matches||[];
+  const d=compute(ms);
+  const stC=champStandings(ms);
+  const teamSt=champTeamStandings(ms);
+  const leader=stC.length?stC[0].name:null;
   const pctG=(w,g)=>g?Math.round(w/g*100):0;
-  const rp=champRolePerf(CHAMP_MATCHES).filter(p=>p.defG+p.attG>0).sort((a,b)=>(b.defG+b.attG)-(a.defG+a.attG));
+  const rp=champRolePerf(ms).filter(p=>p.defG+p.attG>0).sort((a,b)=>(b.defG+b.attG)-(a.defG+a.attG));
   const rpHtml=rp.length?rp.map(p=>{
     const dp=pctG(p.defW,p.defG),ap=pctG(p.attW,p.attG);
     return '<div class="rp-row"><span class="who"><span class="avatar" style="background:'+colorFor(p.name)+'">'+esc(p.name[0])+'</span><b>'+esc(p.name)+'</b></span>'+
@@ -1761,14 +1814,21 @@ function renderChampStats(d){
       '<div class="rp-cell" style="color:'+(p.attG?pctColor(ap):"#c9c3d0")+'">'+(p.attG?ap+"%":"—")+'<div class="rp-sub">'+p.attW+"/"+p.attG+'</div></div></div>';
   }).join(""):'<div class="empty">Il rendimento per ruolo compare quando si gioca.</div>';
 
-  const prHtml=d.playerRank.length?d.playerRank.map(p=>
-    '<div class="rank-row"><span class="pos" style="color:'+p.rankColor+'">'+p.rank+'</span>'+
-    '<span class="who"><span class="avatar" style="background:'+p.color+'">'+esc(p.initial)+'</span><b>'+esc(p.name)+'</b>'+medalTag(p.rank)+'</span>'+
-    '<span class="w">'+p.wins+'</span><span class="p">'+p.played+'</span><span class="pct" style="color:'+pctColor(p.winPct)+'">'+p.winPct+'%</span></div>').join(""):'<div class="empty">Nessuna partita ancora.</div>';
+  const rankColorsC=["#e6b23f","#b7b1bd","#cf9b6a"];
+  const prRows=stC.length?stC.map((p,i)=>
+    '<div class="rank-row"><span class="pos" style="color:'+(rankColorsC[i]||"#c3bdca")+'">'+p.rank+'</span>'+
+    '<span class="who"><span class="avatar" style="background:'+colorFor(p.name)+'">'+esc(p.name[0])+'</span><b>'+esc(p.name)+'</b>'+medalTag(p.rank)+'</span>'+
+    '<span class="w">'+p.wins+'</span><span class="p">'+p.played+'</span><span class="pct" style="color:#8a5a12">'+p.pts+'</span></div>').join(""):'<div class="empty">Nessuna partita ancora.</div>';
 
-  const pairHtml=d.pairRank.length?d.pairRank.map(c=>
-    '<div class="pair-row"><span class="pos">'+c.rank+'</span><span class="pteam"><b>'+esc(c.names)+'</b>'+medalTag(c.rank)+'</span>'+
-    '<span class="wp">'+c.wins+'/'+c.played+'</span><span class="pct" style="color:'+pctColor(c.winPct)+'">'+c.winPct+'%</span></div>').join(""):'<div class="empty">Nessuna coppia con almeno 3 partite.</div>';
+  const teamRows=teamSt.length?teamSt.map(t=>
+    '<div class="pair-row"><span class="pos" style="color:'+(rankColorsC[t.rank-1]||"#c3bdca")+'">'+t.rank+'</span><span class="pteam"><b>'+esc(t.names)+'</b>'+medalTag(t.rank)+'</span>'+
+    '<span class="wp">'+t.wins+'/'+t.played+'</span><span class="pct" style="color:#8a5a12">'+t.pts+'</span></div>').join(""):'<div class="empty">Nessuna coppia ancora.</div>';
+  const indivPod=stC.slice(0,3).map(p=>({name:p.name,pts:p.pts,color:colorFor(p.name)}));
+  const teamPod=teamSt.slice(0,3).map(t=>({names:t.names,members:t.members,pts:t.pts}));
+  const podiosHtml=ms.length?(
+    '<section class="panel"><div class="sect-head"><h2 class="h2">🏆 Podio Team</h2><span class="sect-note">le coppie migliori · attacco+difesa insieme, a punti</span></div>'+podiumHtml(teamPod)+'</section>'+
+    '<section class="panel"><div class="sect-head"><h2 class="h2">👤 Podio Individuale</h2><span class="sect-note">i migliori giocatori · a punti</span></div>'+podiumHtml(indivPod)+'</section>'
+  ):'';
 
   const scHtml=d.scorers.length?d.scorers.map(s=>'<div class="barrow"><div class="top"><b>'+esc(s.names)+'</b><b>'+s.gf+'</b></div><div class="track"><i style="width:'+s.pct+';background:'+s.color+'"></i></div></div>').join(""):'<div class="empty">Servono almeno 3 partite per coppia.</div>';
   const coHtml=d.conceders.length?d.conceders.map(s=>'<div class="barrow"><div class="top"><b>'+esc(s.names)+'</b><b>'+s.ga+'</b></div><div class="track"><i style="width:'+s.pct+';background:'+s.color+'"></i></div></div>').join(""):'<div class="empty">Servono almeno 3 partite per coppia.</div>';
@@ -1777,12 +1837,13 @@ function renderChampStats(d){
   const recHtml=d.recent.length?d.recent.map(m=>'<div class="mrec"><div class="t l" style="color:'+m.blueColor+'">'+esc(m.blue)+'</div><div class="score"><span class="b">'+m.bs+'</span><span class="sep">:</span><span class="r">'+m.rs+'</span></div><div class="t r" style="color:'+m.redColor+'">'+esc(m.red)+'</div></div>').join(""):'<div class="empty">Nessuna partita ancora.</div>';
 
   return ''+
+  podiosHtml+
+  '<section class="two even"><div class="panel"><h2 class="h2">👥 Classifica team (punti)</h2><p class="sect-note" style="margin:8px 0 16px">coppie · attacco+difesa insieme</p>'+
+    '<div class="pair-head"><span>#</span><span>Team</span><span class="cc">V/G</span><span class="rr">Punti</span></div>'+teamRows+'</div>'+
+    '<div class="panel"><h2 class="h2">🏆 Classifica individuale (punti)</h2><p class="sect-note" style="margin:8px 0 16px">3 secca · 2 ai vantaggi · 1 sconfitta ai vantaggi</p>'+
+    '<div class="rank-head"><span>#</span><span>Giocatore</span><span class="cc col-win">Vinte</span><span class="cc col-played">Giocate</span><span class="rr">Punti</span></div>'+prRows+'</div></section>'+
   '<section class="panel"><div class="sect-head"><h2 class="h2">🛡️⚡ Rendimento per ruolo</h2><span class="sect-note">win% giocando in difesa vs attacco</span></div>'+
     '<div class="rp-head"><span>Giocatore</span><span>🛡️ Difesa</span><span>⚡ Attacco</span></div>'+rpHtml+'</section>'+
-  '<section class="two even"><div class="panel"><h2 class="h2" style="margin-bottom:18px">🏆 Classifica giocatori</h2>'+
-    '<div class="rank-head"><span>#</span><span>Giocatore</span><span class="cc col-win">Vinte</span><span class="cc col-played">Giocate</span><span class="rr">Win%</span></div>'+prHtml+'</div>'+
-    '<div class="panel"><h2 class="h2">👥 Classifica team</h2><p class="sect-note" style="margin:8px 0 16px">Minimo 3 partite insieme</p>'+
-    '<div class="pair-head"><span>#</span><span>Team</span><span class="cc">V/G</span><span class="rr">Win%</span></div>'+pairHtml+'</div></section>'+
   '<section class="panel"><div class="sect-head"><h2 class="h2">⚽ Gol fatti</h2><span class="sect-note">per coppia · minimo 3 partite</span></div><div class="barlist grid2">'+scHtml+'</div></section>'+
   '<section class="panel"><div class="sect-head"><h2 class="h2">🧤 Gol subiti</h2><span class="sect-note">meno subiti = miglior difesa</span></div><div class="barlist grid2">'+coHtml+'</div></section>'+
   '<section><h2 class="h2" style="font-size:26px;margin-bottom:18px">Schede giocatori</h2><div class="cards">'+cardsHtml+'</div></section>'+
@@ -1790,10 +1851,10 @@ function renderChampStats(d){
 }
 
 /* scheda espandibile con tutte le combinazioni, valorizzate man mano che si giocano */
-function champCombosHtml(){
-  if(!CHAMP||!CHAMP.roster||CHAMP.roster.length<4)return "";
-  const all=champEnumerate(CHAMP.roster), byKey={};
-  CHAMP_MATCHES.forEach(m=>{byKey[champKey(m.blue,m.red)]=m;});
+function champCombosHtml(roster,matches){
+  if(!roster||roster.length<4)return "";
+  const all=champEnumerate(roster), byKey={};
+  (matches||[]).forEach(m=>{byKey[champKey(m.blue,m.red)]=m;});
   const total=all.length, played=Object.keys(byKey).length;
   const rows=all.map((m,i)=>{
     const rec=byKey[champKey(m.t1,m.t2)];
@@ -1867,8 +1928,8 @@ function renderChamp(){
     '<section class="panel" style="padding:20px 22px"><div class="sect-head"><h2 class="h2">📍 Presenti oggi</h2><span class="sect-note" id="champPresentNote">'+champPresent.size+' presenti · il sorteggio usa solo loro</span></div>'+
       '<div class="ext-chips">'+CHAMP.roster.map(n=>'<button class="ext-chip cpres '+(champPresent.has(n)?"on":"")+'" data-cp="'+esc(n)+'"><span class="dot" style="background:'+colorFor(n)+'"></span>'+esc(n)+'</button>').join("")+'</div></section>'+
     '<section class="next-card"><div class="sect-head"><h2 class="h2">Prossima partita</h2><span class="sect-note">tra i presenti · combinazione non ancora giocata</span></div>'+nextHtml+'</section>'+
-    renderChampStats(d)+
-    champCombosHtml();
+    renderChampStats(CHAMP_MATCHES)+
+    champCombosHtml(CHAMP.roster,CHAMP_MATCHES);
 }
 
 function createChampionship(){
@@ -1909,11 +1970,18 @@ function cancelChampionship(){
 function closeChampionship(){
   if(!CHAMP)return;
   if(!CHAMP_MATCHES.length){toast("Nessuna partita giocata: gioca prima qualche match.");return;}
-  const cd=compute(CHAMP_MATCHES), leader=cd.playerRank[0];
+  const st=champStandings(CHAMP_MATCHES), leader=st[0];
   if(!leader)return;
-  if(!confirm('Chiudere "'+(CHAMP.name||"")+'" e incoronare campione '+leader.name+' ('+leader.winPct+'% · '+leader.wins+'/'+leader.played+')?'))return;
+  const winPct=leader.played?Math.round(leader.wins/leader.played*100):0;
+  if(!confirm('Chiudere "'+(CHAMP.name||"")+'" e incoronare campione '+leader.name+' ('+leader.pts+' punti · '+leader.wins+'/'+leader.played+')?'))return;
+  const podium=st.slice(0,3).map(p=>({name:p.name,pts:p.pts,wins:p.wins,played:p.played,color:colorFor(p.name)}));
+  const teamSt=champTeamStandings(CHAMP_MATCHES);
+  const teamPodium=teamSt.slice(0,3).map(t=>({names:t.names,members:t.members,pts:t.pts,wins:t.wins,played:t.played}));
+  const teamChamp=teamSt[0]?teamSt[0].names:"";
+  const cleanMatches=CHAMP_MATCHES.map(m=>({blue:m.blue,bs:m.bs,red:m.red,rs:m.rs}));
   const trophy={champion:leader.name,championColor:colorFor(leader.name),name:CHAMP.name||"Campionato",
-    date:Date.now(),roster:CHAMP.roster,wins:leader.wins,played:leader.played,winPct:leader.winPct};
+    date:Date.now(),roster:CHAMP.roster,points:leader.pts,wins:leader.wins,played:leader.played,winPct:winPct,
+    podium:podium,teamPodium:teamPodium,teamChamp:teamChamp,matches:cleanMatches};
   champNext=null;
   if(window.dbTrophyAdd&&window.dbChampClear){window.dbTrophyAdd(trophy);window.dbChampClear();}
   else{TROPHIES.unshift({...trophy,_key:"local"+Date.now()});CHAMP=null;CHAMP_MATCHES=[];updateAlboCount();}
@@ -1945,24 +2013,61 @@ byId("champ").addEventListener("click",e=>{
    ===================================================================== */
 let TROPHIES=[];
 function updateAlboCount(){const el=byId("alboCount");if(!el)return;el.textContent=TROPHIES.length;el.hidden=TROPHIES.length===0;}
-function trophyCard(t,i){
-  const d=t.date?new Date(t.date):null;
-  const dstr=d?d.toLocaleDateString("it-IT",{day:"2-digit",month:"short",year:"numeric"}):"";
-  const col=t.championColor||colorFor(t.champion||"?");
-  return '<div class="trophy" style="animation-delay:'+(i*.06)+'s"><span class="crown-badge">👑</span>'+
-    '<div class="cup">🏆</div>'+
-    '<div class="champ-av" style="background:'+col+'">'+esc((t.champion||"?")[0])+'</div>'+
-    '<div class="champ-name">'+esc(t.champion||"—")+'</div><div class="champ-role">Campione</div>'+
-    '<div class="t-name">'+esc(t.name||"Campionato")+'</div><div class="t-date">'+dstr+'</div>'+
-    '<div class="t-stats"><div><b>'+(t.winPct!=null?t.winPct+"%":"—")+'</b>win</div><div><b>'+(t.wins!=null?t.wins:"—")+'</b>vinte</div><div><b>'+(t.played!=null?t.played:"—")+'</b>gioc.</div></div></div>';
+let alboSorted=[];
+function podiumStep(p,place){
+  if(!p)return '';
+  const cls=place===1?"first":place===2?"second":"third";
+  const medal=place===1?"🥇":place===2?"🥈":"🥉";
+  let av,nm;
+  if(p.members&&p.members.length===2){
+    av='<span class="p-duo">'+p.members.map(n=>'<span class="p-av2" style="background:'+colorFor(n)+'">'+esc(n[0])+'</span>').join("")+'</span>';
+    nm=esc(p.names||p.members.join(" & "));
+  }else{
+    if(!p.name)return '';
+    av='<span class="p-av" style="background:'+(p.color||colorFor(p.name))+'">'+esc(p.name[0])+'</span>';
+    nm=esc(p.name);
+  }
+  return '<div class="pstep '+cls+'">'+
+    (place===1?'<span class="p-crown">👑</span>':'')+av+
+    '<span class="p-name">'+nm+'</span>'+
+    '<span class="p-pts">'+(p.pts!=null?p.pts+" pt":"")+'</span>'+
+    '<div class="p-block"><span class="p-medal">'+medal+'</span><span class="p-place">'+place+'°</span></div>'+
+  '</div>';
+}
+function podiumHtml(pod){return '<div class="podium">'+podiumStep(pod[1],2)+podiumStep(pod[0],1)+podiumStep(pod[2],3)+'</div>';}
+function asArray(v){return Array.isArray(v)?v:(v&&typeof v==="object"?Object.values(v):[]);}
+function trophyPodium(t){const pod=asArray(t.podium);return pod.length?pod:(t.champion?[{name:t.champion,pts:t.points,wins:t.wins,played:t.played,color:t.championColor}]:[]);}
+function podiumCard(t,i){
+  const dstr=t.date?new Date(t.date).toLocaleDateString("it-IT",{day:"2-digit",month:"long",year:"numeric"}):"";
+  const teamPod=asArray(t.teamPodium);
+  return '<div class="podium-card" style="animation-delay:'+(i*.06)+'s">'+
+    '<div class="podium-head"><div><div class="pc-name">🏆 '+esc(t.name||"Campionato")+'</div><div class="pc-date">'+dstr+'</div></div>'+
+      (t.matches?'<button class="btn ghost js-albodetail" data-ti="'+i+'">Vedi dettagli ›</button>':'')+'</div>'+
+    (teamPod.length?'<div class="podium-label">🏆 Team vincenti</div>'+podiumHtml(teamPod):'')+
+    '<div class="podium-label">👤 Individuale</div>'+podiumHtml(trophyPodium(t))+'</div>';
 }
 function renderAlbo(){
   const el=document.getElementById("albo"); if(!el)return;
-  const list=TROPHIES.slice().sort((a,b)=>(b.date||0)-(a.date||0));
-  el.innerHTML='<div class="albo-hero"><h2>🏅 Albo d\'oro</h2><p>La bacheca dei trofei · '+list.length+' '+(list.length===1?"campione":"campioni")+'</p></div>'+
-    (list.length?'<div class="trophies">'+list.map((t,i)=>trophyCard(t,i)).join("")+'</div>'
-      :'<div class="albo-empty"><div class="big">🏆</div><b>Nessun trofeo… ancora.</b><div>Avvia un campionato e incorona il primo campione!</div></div>');
+  alboSorted=TROPHIES.slice().sort((a,b)=>(b.date||0)-(a.date||0));
+  el.innerHTML='<div class="albo-hero"><h2>🏅 Albo d\'oro</h2><p>I podi dei campionati conclusi · '+alboSorted.length+' '+(alboSorted.length===1?"campionato":"campionati")+'</p></div>'+
+    (alboSorted.length?alboSorted.map((t,i)=>podiumCard(t,i)).join("")
+      :'<div class="albo-empty"><div class="big">🏆</div><b>Nessun campionato concluso… ancora.</b><div>Completa un campionato e incorona il primo campione!</div></div>');
 }
+function renderAlboDetail(t){
+  const el=document.getElementById("albo"); if(!el)return;
+  const matches=asArray(t.matches).map(m=>({blue:asArray(m.blue),bs:m.bs,red:asArray(m.red),rs:m.rs}));
+  const dstr=t.date?new Date(t.date).toLocaleDateString("it-IT",{day:"2-digit",month:"long",year:"numeric"}):"";
+  el.innerHTML=
+    '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px"><button class="btn ghost js-alboback">← Torna all\'albo</button>'+
+      '<div><div class="pc-name" style="font-size:22px">🏆 '+esc(t.name||"Campionato")+'</div><div class="pc-date">Concluso il '+dstr+' · campione '+esc(t.champion||"—")+'</div></div></div>'+
+    renderChampStats(matches)+
+    champCombosHtml(asArray(t.roster),matches);
+}
+byId("albo").addEventListener("click",e=>{
+  const det=e.target.closest(".js-albodetail");
+  if(det){const t=alboSorted[+det.getAttribute("data-ti")];if(t)renderAlboDetail(t);try{window.scrollTo(0,0);}catch(_){}return;}
+  if(e.target.closest(".js-alboback")){renderAlbo();try{window.scrollTo(0,0);}catch(_){}return;}
+});
 
 /* hook chiamati dal modulo Firebase (nodi championship / trophies) */
 window.applyChampionship=function(champObj){
