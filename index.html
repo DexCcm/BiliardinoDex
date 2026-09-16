@@ -1859,7 +1859,10 @@ function renderChamp(){
       '<div class="fmt-badges"><span class="fmt-badge">🛡️⚡ Ruoli Dif/Att contano</span><span class="fmt-badge">🎨 Colore ignorato</span><span class="fmt-badge">🎯 '+total+' partite</span></div>'+
       '<div class="progress-wrap"><div class="progress-top"><span>Avanzamento</span><span>'+played+' / '+total+' combinazioni</span></div>'+
       '<div class="progress-track"><i style="width:'+prog+'%"></i></div></div>'+
-      (done?'<div class="champ-actions"><button class="btn js-closechamp" style="background:linear-gradient(135deg,#f2b721,#e6a41a);color:#4a3a00;border:none;padding:14px 24px">🏆 Chiudi e incorona il campione</button></div>':'')+
+      '<div class="champ-actions">'+
+        (done?'<button class="btn js-closechamp" style="background:linear-gradient(135deg,#f2b721,#e6a41a);color:#4a3a00;border:none;padding:14px 24px">🏆 Chiudi e incorona il campione</button>':'')+
+        '<button class="btn ghost js-cancelchamp" title="Richiede password">🗑 Annulla campionato</button>'+
+      '</div>'+
     '</section>'+
     '<section class="panel" style="padding:20px 22px"><div class="sect-head"><h2 class="h2">📍 Presenti oggi</h2><span class="sect-note" id="champPresentNote">'+champPresent.size+' presenti · il sorteggio usa solo loro</span></div>'+
       '<div class="ext-chips">'+CHAMP.roster.map(n=>'<button class="ext-chip cpres '+(champPresent.has(n)?"on":"")+'" data-cp="'+esc(n)+'"><span class="dot" style="background:'+colorFor(n)+'"></span>'+esc(n)+'</button>').join("")+'</div></section>'+
@@ -1892,6 +1895,17 @@ function saveChampResult(){
   const win=bs>rs?rec.blue.join(" & "):rec.red.join(" & ");
   toast("⚽ Registrata · vincono "+win);
 }
+function cancelChampionship(){
+  if(!CHAMP)return;
+  if(!confirm('Annullare il campionato "'+(CHAMP.name||"")+'"? Le partite del campionato verranno eliminate (l\'albo d\'oro resta).'))return;
+  const pw=prompt("Per confermare l'eliminazione inserisci la password:");
+  if(pw===null)return;                                   // annullato dall'utente
+  if(pw!=="Mellon"){toast("❌ Password errata · campionato NON eliminato");return;}
+  champNext=null; champPresent=null;
+  if(window.dbChampClear){window.dbChampClear();}
+  else{CHAMP=null;CHAMP_MATCHES=[];renderChamp();}
+  toast("🗑️ Campionato annullato");
+}
 function closeChampionship(){
   if(!CHAMP)return;
   if(!CHAMP_MATCHES.length){toast("Nessuna partita giocata: gioca prima qualche match.");return;}
@@ -1914,6 +1928,7 @@ byId("champ").addEventListener("click",e=>{
   if(t.closest(".js-sorteggia")){refreshNextSlots();return;}
   if(t.closest(".js-savechamp"))return saveChampResult();
   if(t.closest(".js-closechamp"))return closeChampionship();
+  if(t.closest(".js-cancelchamp"))return cancelChampionship();
   const st=t.closest("[data-cstep]");
   if(st){const parts=st.getAttribute("data-cstep").split(":");const inp=byId("champ"+parts[0].toUpperCase());if(inp){let v=parseInt(inp.value||"0",10)+parseInt(parts[1],10);inp.value=Math.max(0,Math.min(30,v));}return;}
   const rc=t.closest(".rchip[data-p]");
