@@ -1,4 +1,4 @@
-# 🏓 Bigliardino DEX
+#  Bigliardino DEX
 
 Dashboard di un torneo di **calcio balilla (biliardino)** interno a **Dataexpert**.
 Classifiche giocatori e team, statistiche, sfida Blu vs Rosso, registrazione partite —
