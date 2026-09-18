@@ -592,6 +592,8 @@ footer{text-align:center;padding:10px 0 4px;font-size:13px;font-weight:700;color
 .pstep .p-duo{display:flex;justify-content:center}
 .pstep .p-av2{width:40px;height:40px;border-radius:50%;color:#fff;font-family:var(--display);font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 10px rgba(70,66,80,.2)}
 .pstep .p-av2:not(:first-child){margin-left:-12px}
+.pstep .p-crest{width:56px;height:56px;border-radius:50%;background-size:cover;background-position:center;border:3px solid #fff;box-shadow:0 6px 14px rgba(70,66,80,.24);cursor:pointer;position:relative;transition:transform .2s cubic-bezier(.2,.8,.2,1)}
+.pstep .p-crest:hover,.pstep .p-crest.zoomed{transform:scale(1.6);z-index:6;box-shadow:0 12px 28px rgba(70,66,80,.34)}
 .podium{display:flex;align-items:flex-end;justify-content:center;gap:14px;padding:14px 0 0}
 .pstep{display:flex;flex-direction:column;align-items:center;gap:6px;width:32%;max-width:150px;position:relative}
 .pstep .p-crown{font-size:24px;line-height:1;animation:crownPulse 1.6s ease-in-out infinite;transform-origin:center}
@@ -2009,6 +2011,7 @@ function closeChampionship(){
 /* deleghe eventi Campionato */
 byId("champ").addEventListener("click",e=>{
   const t=e.target;
+  const cr=t.closest(".p-crest"); if(cr){cr.classList.toggle("zoomed");return;}
   if(t.closest(".js-createchamp"))return createChampionship();
   if(t.closest(".js-sorteggia")){refreshNextSlots();return;}
   if(t.closest(".js-savechamp"))return saveChampResult();
@@ -2031,13 +2034,21 @@ byId("champ").addEventListener("click",e=>{
 let TROPHIES=[];
 function updateAlboCount(){const el=byId("alboCount");if(!el)return;el.textContent=TROPHIES.length;el.hidden=TROPHIES.length===0;}
 let alboSorted=[];
+/* stemmi squadre (link a cartella images) — chiave = nome coppia ordinato "A & B". Squadre senza stemma → iniziali. */
+const IMG_BASE = "images/";   /* cartella immagini nella root del progetto (GitHub Pages / hosting) */
+const TEAM_CRESTS = { "Silvia & Simo": "Simo_Silvia_Shiva.png" };
+function crestUrl(key){ const f = TEAM_CRESTS[key]; return f ? IMG_BASE + encodeURI(f) : null; }
 function podiumStep(p,place){
   if(!p)return '';
   const cls=place===1?"first":place===2?"second":"third";
   const medal=place===1?"🥇":place===2?"🥈":"🥉";
   let av,nm;
   if(p.members&&p.members.length===2){
-    av='<span class="p-duo">'+p.members.map(n=>'<span class="p-av2" style="background:'+colorFor(n)+'">'+esc(n[0])+'</span>').join("")+'</span>';
+    const key=p.names||p.members.slice().sort().join(" & ");
+    const crest=crestUrl(key);
+    av=crest
+      ? '<span class="p-crest" style="background-image:url('+crest+')"></span>'
+      : '<span class="p-duo">'+p.members.map(n=>'<span class="p-av2" style="background:'+colorFor(n)+'">'+esc(n[0])+'</span>').join("")+'</span>';
     nm=esc(p.names||p.members.join(" & "));
   }else{
     if(!p.name)return '';
@@ -2081,6 +2092,7 @@ function renderAlboDetail(t){
     champCombosHtml(asArray(t.roster),matches);
 }
 byId("albo").addEventListener("click",e=>{
+  const cr=e.target.closest(".p-crest"); if(cr){cr.classList.toggle("zoomed");return;}
   const det=e.target.closest(".js-albodetail");
   if(det){const t=alboSorted[+det.getAttribute("data-ti")];if(t)renderAlboDetail(t);try{window.scrollTo(0,0);}catch(_){}return;}
   if(e.target.closest(".js-alboback")){renderAlbo();try{window.scrollTo(0,0);}catch(_){}return;}
