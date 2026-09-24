@@ -2036,7 +2036,10 @@ function updateAlboCount(){const el=byId("alboCount");if(!el)return;el.textConte
 let alboSorted=[];
 /* stemmi squadre (link a cartella images) — chiave = nome coppia ordinato "A & B". Squadre senza stemma → iniziali. */
 const IMG_BASE = "images/";   /* cartella immagini nella root del progetto (GitHub Pages / hosting) */
-const TEAM_CRESTS = { "Silvia & Simo": "Simo_Silvia_Shiva.png" };
+const TEAM_CRESTS = { "Silvia & Simo": "Simo_Silvia_Shiva.png" ,
+                      "Damiano & Simo": "Peebo.jpg",
+                      "Leo & Simo": "Peco.jpg"
+                    };
 function crestUrl(key){ const f = TEAM_CRESTS[key]; return f ? IMG_BASE + encodeURI(f) : null; }
 function podiumStep(p,place){
   if(!p)return '';
