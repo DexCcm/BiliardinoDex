@@ -276,6 +276,11 @@ section{animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
   0%,100%{transform:rotate(-26deg) scale(1);filter:drop-shadow(0 1px 2px rgba(90,70,20,.35))}
   50%{transform:rotate(-26deg) scale(1.2);filter:drop-shadow(0 0 9px rgba(242,183,33,.95)) drop-shadow(0 0 3px rgba(255,240,180,.9))}
 }
+.pcard .badge .tcup{position:absolute;top:-16px;right:-15px;font-size:29px;line-height:1;pointer-events:none;transform-origin:center;animation:cupPulse 1.8s ease-in-out infinite;z-index:2}
+@keyframes cupPulse{
+  0%,100%{transform:rotate(14deg) scale(1);filter:drop-shadow(0 1px 2px rgba(90,70,20,.35))}
+  50%{transform:rotate(14deg) scale(1.14);filter:drop-shadow(0 0 8px rgba(242,183,33,.9))}
+}
 .pcard .nm{font-family:var(--display);font-weight:700;font-size:21px;color:var(--ink);line-height:1}
 .pcard .pl{font-size:13px;font-weight:700;color:var(--muted2);margin-top:3px}
 .role{font-weight:800;font-size:12px;padding:7px 12px;border-radius:30px;white-space:nowrap;align-self:flex-start;display:inline-flex;align-items:center;gap:4px;position:relative;overflow:hidden;box-shadow:0 0 9px color-mix(in srgb, currentColor 20%, transparent)}
@@ -1073,12 +1078,14 @@ function rodsHtml(rods,pegSize){
 }
 
 /* ---- scheda giocatore (condivisa dashboard + campionato) ---- */
-function playerCardHtml(c,leaderName){
+function playerCardHtml(c,leaderName,topTeam){
+  const crown = c.name===leaderName ? '<span class="crown" aria-label="Primo individuale">👑</span>' : '';
+  const cup = (topTeam && topTeam.indexOf(c.name)>=0) ? '<span class="tcup" aria-label="Squadra 1ª in classifica">🏆</span>' : '';
   return `
     <div class="pcard">
       <div class="tint" style="background:${c.tint}"></div>
       <div class="row1">
-        <div class="badge${c.name===leaderName?" leader":""}" style="background:${c.color}">${c.name===leaderName?'<span class="crown" aria-label="Primo in classifica">👑</span>':''}${esc(c.initial)}</div>
+        <div class="badge${c.name===leaderName?" leader":""}" style="background:${c.color}">${crown}${cup}${esc(c.initial)}</div>
         <div><div class="nm">${esc(c.name)}</div><div class="pl">${c.played} partite giocate</div></div>
         <span style="flex:1"></span>
         <div class="role" title="${esc(c.roleDetail)}" style="background:${c.roleBg};color:${c.roleColor}"><span class="role-ic">${c.roleIcon}</span> ${c.role}</div>
@@ -1157,7 +1164,8 @@ function render(){
   const pairRankHtml=_tr.rows, teamPagerHtml=_tr.pager;
 
   const leaderName = d.playerRank.length ? d.playerRank[0].name : null;
-  const cardsHtml=d.cards.map(c=>playerCardHtml(c,leaderName)).join("");
+  const topTeam = d.pairRank.length ? d.pairRank[0].names.split(" & ") : null;
+  const cardsHtml=d.cards.map(c=>playerCardHtml(c,leaderName,topTeam)).join("");
 
   const recentHtml=d.recent.map(m=>`
     <div class="mrec"><div class="t l" style="color:${m.blueColor}">${esc(m.blue)}</div>
@@ -1852,7 +1860,8 @@ function renderChampStats(matches){
   const scHtml=d.scorers.length?d.scorers.map(s=>'<div class="barrow"><div class="top"><b>'+esc(s.names)+'</b><b>'+s.gf+'</b></div><div class="track"><i style="width:'+s.pct+';background:'+s.color+'"></i></div></div>').join(""):'<div class="empty">Servono almeno 3 partite per coppia.</div>';
   const coHtml=d.conceders.length?d.conceders.map(s=>'<div class="barrow"><div class="top"><b>'+esc(s.names)+'</b><b>'+s.ga+'</b></div><div class="track"><i style="width:'+s.pct+';background:'+s.color+'"></i></div></div>').join(""):'<div class="empty">Servono almeno 3 partite per coppia.</div>';
 
-  const cardsHtml=d.cards.length?d.cards.map(c=>playerCardHtml(c,leader)).join(""):'<div class="empty">Le schede compaiono quando i giocatori raggiungono 5 partite.</div>';
+  const champTopTeam=teamSt.length?teamSt[0].members:null;
+  const cardsHtml=d.cards.length?d.cards.map(c=>playerCardHtml(c,leader,champTopTeam)).join(""):'<div class="empty">Le schede compaiono quando i giocatori raggiungono 5 partite.</div>';
   const recHtml=d.recent.length?d.recent.map(m=>'<div class="mrec"><div class="t l" style="color:'+m.blueColor+'">'+esc(m.blue)+'</div><div class="score"><span class="b">'+m.bs+'</span><span class="sep">:</span><span class="r">'+m.rs+'</span></div><div class="t r" style="color:'+m.redColor+'">'+esc(m.red)+'</div></div>').join(""):'<div class="empty">Nessuna partita ancora.</div>';
 
   return ''+
@@ -2036,10 +2045,11 @@ function updateAlboCount(){const el=byId("alboCount");if(!el)return;el.textConte
 let alboSorted=[];
 /* stemmi squadre (link a cartella images) — chiave = nome coppia ordinato "A & B". Squadre senza stemma → iniziali. */
 const IMG_BASE = "images/";   /* cartella immagini nella root del progetto (GitHub Pages / hosting) */
-const TEAM_CRESTS = { "Silvia & Simo": "Simo_Silvia_Shiva.png" ,
-                      "Damiano & Simo": "Peebo.jpg",
-                      "Leo & Simo": "Peco.jpg"
-                    };
+const TEAM_CRESTS = {
+  "Silvia & Simo": "Simo_Silvia_Shiva.png",
+  "Damiano & Simo": "Peebo.jpg",
+  "Leo & Simo": "Peco.jpg"
+};
 function crestUrl(key){ const f = TEAM_CRESTS[key]; return f ? IMG_BASE + encodeURI(f) : null; }
 function podiumStep(p,place){
   if(!p)return '';
